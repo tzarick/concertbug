@@ -78,5 +78,5 @@ export class CustomMap extends React.Component<Props> {
 // }
 
 // export default GoogleApiWrapper({
-//   apiKey: 'AIzaSyATRg7QT97jEQOaNjwwtMF7o-fnxdrGIxM',
+//   apiKey: APIKEY,
 // })(CustomMap);
