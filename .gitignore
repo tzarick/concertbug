@@ -11,6 +11,9 @@
 # production
 /build
 
+# sensitive info
+.env*
+
 # misc
 .DS_Store
 .env.local

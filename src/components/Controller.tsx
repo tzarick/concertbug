@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import { CustomMap } from './CustomMap';
 
 export class Controller extends React.Component {
   public render() {
-    return 'ahoy matey';
+    return <CustomMap divId="map" />;
   }
 }
