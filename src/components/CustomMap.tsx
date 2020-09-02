@@ -20,11 +20,20 @@ export class CustomMap extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { mapCenter: new google.maps.LatLng(0, 0) }; // will be replaced shortly
+
+    const center: google.maps.LatLng = new google.maps.LatLng(
+      39.9612,
+      -82.9988
+    ); // Columbus
+    this.state = { mapCenter: center };
   }
 
   componentDidMount(): void {
-    this.map = new CustomMapModel(this.props.divId, this.updateCenter);
+    this.map = new CustomMapModel(
+      this.props.divId,
+      this.state.mapCenter,
+      this.updateCenter
+    );
     this.map.attachCoordinateListener();
   }
 
@@ -34,8 +43,9 @@ export class CustomMap extends React.Component<Props, State> {
 
   render(): JSX.Element {
     if (this.map) {
-      this.map.setCenter(this.state.mapCenter);
+      this.map.setCenter(this.state.mapCenter); // instead of re-centering here we would get the new list of concerts / generate new markers based on the changed inputs
     }
+    console.log('renderoo');
     return <div className="googlemap" id={this.props.divId} />;
   }
 }

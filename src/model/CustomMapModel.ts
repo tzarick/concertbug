@@ -4,11 +4,11 @@ import { mapStyles } from '../styles/mapStyles';
 export class CustomMapModel {
   private googleMap: google.maps.Map;
 
-  constructor(divId: string, private updateCenter: Function) {
-    const center: google.maps.LatLngLiteral = {
-      lat: 39.9612, // Columbus
-      lng: -82.9988,
-    };
+  constructor(
+    divId: string,
+    center: google.maps.LatLng,
+    private updateCenter: (center: google.maps.LatLng) => void
+  ) {
     this.googleMap = new window.google.maps.Map(
       document.getElementById(divId) as HTMLElement,
       {
@@ -18,8 +18,6 @@ export class CustomMapModel {
         styles: mapStyles,
       }
     );
-
-    updateCenter(this.googleMap.getCenter());
   }
 
   setZoom(zoom: number): void {
