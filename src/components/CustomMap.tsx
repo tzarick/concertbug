@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import '../styles/CustomMap.css';
-import { mapStyles } from '../styles/mapStyles';
 import { CustomMapModel } from '../model/CustomMapModel';
 
 // import { Map, GoogleApiWrapper, GoogleAPI } from 'google-maps-react';
@@ -17,13 +16,11 @@ interface State {
 }
 
 export class CustomMap extends React.Component<Props, State> {
-  map: CustomMapModel | null = null;
+  map: CustomMapModel | null = null; // add value once component mounts
 
   constructor(props: Props) {
     super(props);
-
     this.state = { mapCenter: new google.maps.LatLng(0, 0) }; // will be replaced shortly
-    // this.map = new CustomMapModel(this.props.divId, this.updateCenter);
   }
 
   componentDidMount(): void {
@@ -35,7 +32,7 @@ export class CustomMap extends React.Component<Props, State> {
     this.setState({ mapCenter: center });
   };
 
-  render() {
+  render(): JSX.Element {
     if (this.map) {
       this.map.setCenter(this.state.mapCenter);
     }
