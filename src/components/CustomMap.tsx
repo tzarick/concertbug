@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import '../styles/CustomMap.css';
 import { mapStyles } from '../styles/mapStyles';
+import { CustomMapModel } from '../model/CustomMapModel';
 
 // import { Map, GoogleApiWrapper, GoogleAPI } from 'google-maps-react';
 // import { CustomMapModel } from '../model/CustomMapModel';
@@ -11,31 +12,32 @@ interface Props {
   // apiKey: string;
 }
 
-export class CustomMap extends React.Component<Props> {
-  componentDidMount(): void {
-    const center: google.maps.LatLngLiteral = {
-      lat: 39.9612, // Columbus
-      lng: -82.9988,
-    };
-    const map = new window.google.maps.Map(
-      document.getElementById(this.props.divId) as Element,
-      {
-        center: center,
-        zoom: 5,
-        mapTypeId: 'roadmap',
-        styles: mapStyles,
-      }
-    );
+interface State {
+  mapCenter: google.maps.LatLng;
+}
+
+export class CustomMap extends React.Component<Props, State> {
+  map: CustomMapModel | null = null;
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = { mapCenter: new google.maps.LatLng(0, 0) }; // will be replaced shortly
+    // this.map = new CustomMapModel(this.props.divId, this.updateCenter);
   }
 
+  componentDidMount(): void {
+    this.map = new CustomMapModel(this.props.divId, this.updateCenter);
+    this.map.attachCoordinateListener();
+  }
+
+  private updateCenter = (center: google.maps.LatLng): void => {
+    this.setState({ mapCenter: center });
+  };
+
   render() {
-    return (
-      <div
-        // style={{ height: 500, width: 500 }}
-        className="googlemap"
-        id={this.props.divId}
-      />
-    );
+    console.log('renderoo');
+    return <div className="googlemap" id={this.props.divId} />;
   }
 }
 // export class CustomMap extends React.Component<Props> {
