@@ -36,7 +36,9 @@ export class CustomMap extends React.Component<Props, State> {
   };
 
   render() {
-    console.log('renderoo');
+    if (this.map) {
+      this.map.setCenter(this.state.mapCenter);
+    }
     return <div className="googlemap" id={this.props.divId} />;
   }
 }

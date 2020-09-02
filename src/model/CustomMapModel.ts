@@ -26,6 +26,10 @@ export class CustomMapModel {
     this.googleMap.setZoom(zoom);
   }
 
+  setCenter(center: google.maps.LatLng) {
+    this.googleMap.setCenter(center);
+  }
+
   attachCoordinateListener(): void {
     this.googleMap.addListener(
       'click',
