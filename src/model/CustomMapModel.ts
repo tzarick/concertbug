@@ -50,7 +50,7 @@ export class CustomMapModel {
 
     setTimeout(() => {
       marker.setAnimation(null);
-    }, 1500); // bounce for 1.5 seconds and then stop so it doesn't look like an overwhelming flood
+    }, 1500); // bounce for 1.5 seconds and then stop so it doesn't look like an overwhelming bug infestation
   }
 
   private attachInfoWindow(marker: google.maps.Marker): void {
