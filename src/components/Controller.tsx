@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { CustomMap } from './CustomMap';
+import { UserForm } from './UserForm';
 
 interface UserContraints {
   distanceRadius: number; // miles
@@ -37,6 +38,11 @@ export class Controller extends React.Component<Props, State> {
   }
 
   public render(): JSX.Element {
-    return <CustomMap divId="map" />;
+    return (
+      <div className="controller">
+        <UserForm />
+        <CustomMap divId="map" />
+      </div>
+    );
   }
 }
