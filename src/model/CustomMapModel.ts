@@ -1,4 +1,5 @@
 import { mapStyles } from '../styles/mapStyles';
+import bugMarkerPath from '../styles/images/BugMarker64.png';
 
 // google map wrapper class
 export class CustomMapModel {
@@ -41,7 +42,7 @@ export class CustomMapModel {
     var marker = new google.maps.Marker({
       position: coords,
       map: this.googleMap,
-      title: 'Ahoy Matey',
+      icon: bugMarkerPath,
       animation: google.maps.Animation.BOUNCE,
     });
 
@@ -67,9 +68,9 @@ export class CustomMapModel {
     infoWindow.set('openStatus', false); // not open yet
 
     marker.addListener('click', () => {
-      const open = infoWindow.get('openStatus');
+      const isOpen = infoWindow.get('openStatus');
 
-      if (!open) {
+      if (!isOpen) {
         infoWindow.open(this.googleMap, marker);
         infoWindow.set('openStatus', true);
       } else {
