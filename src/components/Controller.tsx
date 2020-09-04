@@ -31,9 +31,9 @@ export class Controller extends React.Component<Props, State> {
       dateStart: new Date(),
       dateEnd: new Date(),
     };
-    setTimeout(() => {
-      this.setState({ userConstraints: newConstraints });
-    }, 5000);
+    // setTimeout(() => {
+    //   this.setState({ userConstraints: newConstraints });
+    // }, 5000);
   }
 
   public render(): JSX.Element {

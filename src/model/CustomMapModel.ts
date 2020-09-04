@@ -37,6 +37,48 @@ export class CustomMapModel {
     );
   }
 
+  placeMarker(coords: google.maps.LatLng): void {
+    var marker = new google.maps.Marker({
+      position: coords,
+      map: this.googleMap,
+      title: 'Ahoy Matey',
+      animation: google.maps.Animation.BOUNCE,
+    });
+
+    this.attachInfoWindow(marker);
+
+    setTimeout(() => {
+      marker.setAnimation(null);
+    }, 1500); // bounce for 1.5 seconds and then stop so it doesn't look like an overwhelming flood
+  }
+
+  private attachInfoWindow(marker: google.maps.Marker): void {
+    const content = `
+      <div>
+        <h3>Mouthwatering Concert #1</h3>
+        <p>details etc...</p>
+      </div>
+    `;
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: content,
+    });
+
+    infoWindow.set('openStatus', false); // not open yet
+
+    marker.addListener('click', () => {
+      const open = infoWindow.get('openStatus');
+
+      if (!open) {
+        infoWindow.open(this.googleMap, marker);
+        infoWindow.set('openStatus', true);
+      } else {
+        infoWindow.close();
+        infoWindow.set('openStatus', false);
+      }
+    });
+  }
+
   private handleNewCoords(latLng: google.maps.LatLng): void {
     console.log(`lat: ${latLng.lat()}`);
     console.log(`lng: ${latLng.lng()}`);

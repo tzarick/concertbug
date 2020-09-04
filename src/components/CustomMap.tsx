@@ -43,8 +43,10 @@ export class CustomMap extends React.Component<Props, State> {
 
   render(): JSX.Element {
     if (this.map) {
-      this.map.setCenter(this.state.mapCenter); // instead of re-centering here we would get the new list of concerts / generate new markers based on the changed inputs
+      // this.map.setCenter(this.state.mapCenter); // instead of re-centering here we would get the new list of concerts / generate new markers based on the changed inputs
+      this.map.placeMarker(this.state.mapCenter);
     }
+
     console.log('renderoo');
     return <div className="googlemap" id={this.props.divId} />;
   }
