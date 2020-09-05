@@ -117,7 +117,7 @@ const FormDrawer: React.FC<DrawerProps> = ({
   );
 };
 
-export class UserForm extends React.Component<Props, State> {
+export class FilterForm extends React.Component<Props, State> {
   // const [state, setState] = useState({ drawerOpen: false });
   constructor(props: Props) {
     super(props);
@@ -155,7 +155,6 @@ export class UserForm extends React.Component<Props, State> {
             onSubmit={this.props.onSubmit}
             updateDrawer={this.updateDrawer}
           />
-          {/* {FormDrawer(this.props.onSubmit, this.updateDrawer)} */}
         </Drawer>
       </div>
     );

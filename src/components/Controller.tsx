@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { CustomMap } from './CustomMap';
-import { UserForm } from './UserForm';
+import { FilterForm } from './UserForm';
 import { CustomHeader } from './CustomHeader';
 
 export interface UserConstraints {
@@ -53,16 +53,22 @@ export class Controller extends React.Component<Props, State> {
   public render(): JSX.Element {
     return (
       <div className="controller">
-        <UserForm
-          onSubmit={(constraints: UserConstraints): void => {
+        <CustomHeader
+          onFilterConstraintsSubmit={(constraints: UserConstraints): void => {
             console.log(constraints);
             this.updateUserContstraints(constraints);
-            // this.updateDrawer(false);
           }}
+        />
+        {/* <FilterForm
+          // onSubmit={(constraints: UserConstraints): void => {
+          //   console.log(constraints);
+          //   this.updateUserContstraints(constraints);
+          //   // this.updateDrawer(false);
+          // }}
           // drawerOpen={this.state.filterDrawerOpen}
           // updateDrawer={this.updateDrawer}
-        />
-        {/* <CustomHeader /> */}
+        /> */}
+
         <CustomMap divId="map" />
       </div>
     );
