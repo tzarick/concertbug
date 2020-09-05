@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { CustomMap } from './CustomMap';
 import { UserForm } from './UserForm';
+import { CustomHeader } from './CustomHeader';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -12,12 +13,14 @@ interface Props {}
 
 interface State {
   userConstraints: UserConstraints;
+  filterDrawerOpen: boolean;
 }
 
 export class Controller extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      filterDrawerOpen: false,
       userConstraints: {
         distanceRadius: 500,
         startDate: new Date(), // now, as default start
@@ -43,6 +46,10 @@ export class Controller extends React.Component<Props, State> {
     });
   }
 
+  updateDrawer = (open: boolean): void => {
+    this.setState({ ...this.state, filterDrawerOpen: open });
+  };
+
   public render(): JSX.Element {
     return (
       <div className="controller">
@@ -51,7 +58,10 @@ export class Controller extends React.Component<Props, State> {
             console.log(constraints);
             this.updateUserContstraints(constraints);
           }}
+          drawerOpen={this.state.filterDrawerOpen}
+          updateDrawer={this.updateDrawer}
         />
+        {/* <CustomHeader /> */}
         <CustomMap divId="map" />
       </div>
     );
