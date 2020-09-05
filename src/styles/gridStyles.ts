@@ -3,6 +3,14 @@ import { red } from '@material-ui/core/colors';
 
 export const gridStyles = makeStyles((theme: Theme) => {
   return createStyles({
+    headerContainer: {
+      flexGrow: 1,
+      backgroundColor: '#000000',
+    },
+    headerItem: {
+      padding: theme.spacing(2),
+      // backgroundColor: '#ffebee',
+    },
     formContainer: {
       flexGrow: 1,
     },

@@ -4,12 +4,16 @@
   height: 30%;
 } */
 
-.form-container {
+/* .form-container {
   display: flex;
   height: 100%;
-}
+} */
 
-.filter {
+/* .filter {
   margin: 100px;
   background-color: blueviolet;
+} */
+
+.filterButton {
+  background-color: '#ffebee';
 }

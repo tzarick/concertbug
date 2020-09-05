@@ -136,8 +136,8 @@ export class FilterForm extends React.Component<Props, State> {
     return (
       <div>
         <Button
+          className="filterButton"
           variant="contained"
-          color="primary"
           onClick={() => {
             this.updateDrawer(true);
           }}
