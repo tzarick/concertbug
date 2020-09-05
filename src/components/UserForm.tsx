@@ -2,16 +2,24 @@ import React, { Component, useState } from 'react';
 import { TextField, Button, Grid, Drawer } from '@material-ui/core';
 import { Formik, Form, Field } from 'formik';
 import { UserConstraints } from './Controller';
+import { gridStyles } from '../styles/gridStyles';
 
 interface Props {
-  drawerOpen: boolean;
+  // drawerOpen: boolean;
   onSubmit: (values: UserConstraints) => void;
-  updateDrawer: (open: boolean) => void;
+  // updateDrawer: (open: boolean) => void;
 }
 
-interface State {}
+interface State {
+  drawerOpen: boolean;
+}
 
-function FormDrawer(onSubmit: (values: UserConstraints) => void): JSX.Element {
+function FormDrawer(
+  onSubmit: (values: UserConstraints) => void,
+  updateDrawer: (open: boolean) => void
+): JSX.Element {
+  // const classes = gridStyles();
+
   return (
     <Formik
       initialValues={{
@@ -28,12 +36,15 @@ function FormDrawer(onSubmit: (values: UserConstraints) => void): JSX.Element {
           <Form>
             <Grid
               container
-              direction="row"
-              justify="flex-start"
-              alignItems="baseline"
+              // className={classes.root}
+              spacing={3}
+              direction="column"
+              justify="center"
+              alignItems="center"
             >
-              <div>
+              <Grid item>
                 <TextField
+                  // className={classes.filter}
                   size="small"
                   placeholder="Distance Radius"
                   name="distanceRadius"
@@ -41,9 +52,10 @@ function FormDrawer(onSubmit: (values: UserConstraints) => void): JSX.Element {
                   onBlur={handleBlur}
                   type="number"
                 />
-              </div>
-              <div>
+              </Grid>
+              <Grid item>
                 <TextField
+                  // className={classes.filter}
                   helperText="Date Range Start"
                   placeholder="Date Range Start"
                   name="startDate"
@@ -51,9 +63,10 @@ function FormDrawer(onSubmit: (values: UserConstraints) => void): JSX.Element {
                   onBlur={handleBlur}
                   type="date"
                 />
-              </div>
-              <div>
+              </Grid>
+              <Grid item>
                 <TextField
+                  // className={classes.filter}
                   helperText="Date Range End"
                   placeholder="Date Range End"
                   name="endDate"
@@ -61,9 +74,16 @@ function FormDrawer(onSubmit: (values: UserConstraints) => void): JSX.Element {
                   onBlur={handleBlur}
                   type="date"
                 />
-              </div>
+              </Grid>
               <div>
-                <Button type="submit" variant="contained" color="secondary">
+                <Button
+                  onClick={() => {
+                    updateDrawer(false);
+                  }}
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                >
                   Go
                 </Button>
               </div>
@@ -75,45 +95,43 @@ function FormDrawer(onSubmit: (values: UserConstraints) => void): JSX.Element {
   );
 }
 
-// const toggleDrawer = (set, state, open) => (event) => {
-//   if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-//     return;
-//   }
-
-//   set({ ...state, drawerOpen: open });
-// };
-
-export const UserForm: React.FC<Props> = ({
-  onSubmit,
-  drawerOpen,
-  updateDrawer,
-}) => {
+export class UserForm extends React.Component<Props, State> {
   // const [state, setState] = useState({ drawerOpen: false });
-  return (
-    <div>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          updateDrawer(true);
-        }}
-      >
-        Add Filters
-      </Button>
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={() => {
-          updateDrawer(false);
-        }}
-      >
-        Helloooooo
-      </Drawer>
-    </div>
-  );
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      drawerOpen: false,
+    };
+  }
 
-  // <Drawer anchor={anchor} open={state[anchor]} onClose={toggleDrawer(anchor, false)}>
-  //   {list(anchor)}
-  // </Drawer>
-  // FormDrawer(onSubmit);
-};
+  updateDrawer = (open: boolean): void => {
+    this.setState({
+      drawerOpen: open,
+    });
+  };
+
+  render(): JSX.Element {
+    return (
+      <div>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            this.updateDrawer(true);
+          }}
+        >
+          Add Filters
+        </Button>
+        <Drawer
+          anchor="left"
+          open={this.state.drawerOpen}
+          onClose={() => {
+            this.updateDrawer(false);
+          }}
+        >
+          {FormDrawer(this.props.onSubmit, this.updateDrawer)}
+        </Drawer>
+      </div>
+    );
+  }
+}

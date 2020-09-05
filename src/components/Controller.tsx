@@ -46,9 +46,9 @@ export class Controller extends React.Component<Props, State> {
     });
   }
 
-  updateDrawer = (open: boolean): void => {
-    this.setState({ ...this.state, filterDrawerOpen: open });
-  };
+  // updateDrawer = (open: boolean): void => {
+  //   this.setState({ ...this.state, filterDrawerOpen: open });
+  // };
 
   public render(): JSX.Element {
     return (
@@ -57,9 +57,10 @@ export class Controller extends React.Component<Props, State> {
           onSubmit={(constraints: UserConstraints): void => {
             console.log(constraints);
             this.updateUserContstraints(constraints);
+            // this.updateDrawer(false);
           }}
-          drawerOpen={this.state.filterDrawerOpen}
-          updateDrawer={this.updateDrawer}
+          // drawerOpen={this.state.filterDrawerOpen}
+          // updateDrawer={this.updateDrawer}
         />
         {/* <CustomHeader /> */}
         <CustomMap divId="map" />
