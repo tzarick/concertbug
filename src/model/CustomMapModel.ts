@@ -4,6 +4,7 @@ import bugMarkerPath from '../styles/images/BugMarker64.png';
 // google map wrapper class
 export class CustomMapModel {
   private googleMap: google.maps.Map;
+  private markers: google.maps.Marker[] = [];
 
   constructor(
     divId: string,
@@ -51,6 +52,8 @@ export class CustomMapModel {
     setTimeout(() => {
       marker.setAnimation(null);
     }, 1500); // bounce for 1.5 seconds and then stop so it doesn't look like an overwhelming bug infestation
+
+    this.markers.push(marker);
   }
 
   private attachInfoWindow(marker: google.maps.Marker): void {
@@ -78,6 +81,13 @@ export class CustomMapModel {
         infoWindow.set('openStatus', false);
       }
     });
+  }
+
+  clearMarkers(): void {
+    for (let marker of this.markers) {
+      marker.setMap(null);
+    }
+    this.markers = [];
   }
 
   private handleNewCoords(latLng: google.maps.LatLng): void {
