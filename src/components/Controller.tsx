@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { CustomMap } from './CustomMap';
-import { FilterForm } from './UserForm';
 import { CustomHeader } from './CustomHeader';
 
 export interface UserConstraints {
@@ -46,10 +45,6 @@ export class Controller extends React.Component<Props, State> {
     });
   }
 
-  // updateDrawer = (open: boolean): void => {
-  //   this.setState({ ...this.state, filterDrawerOpen: open });
-  // };
-
   public render(): JSX.Element {
     return (
       <div className="controller">
@@ -59,16 +54,6 @@ export class Controller extends React.Component<Props, State> {
             this.updateUserContstraints(constraints);
           }}
         />
-        {/* <FilterForm
-          // onSubmit={(constraints: UserConstraints): void => {
-          //   console.log(constraints);
-          //   this.updateUserContstraints(constraints);
-          //   // this.updateDrawer(false);
-          // }}
-          // drawerOpen={this.state.filterDrawerOpen}
-          // updateDrawer={this.updateDrawer}
-        /> */}
-
         <CustomMap divId="map" />
       </div>
     );

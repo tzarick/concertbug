@@ -1,16 +1,14 @@
-import React, { Component, useState } from 'react';
-import { TextField, Button, Grid, Drawer } from '@material-ui/core';
-import { Formik, Form, Field } from 'formik';
+import React from 'react';
+import { Form, Formik } from 'formik';
 import { UserConstraints } from './Controller';
 import { gridStyles } from '../styles/gridStyles';
+import { Button, Drawer, Grid, TextField } from '@material-ui/core';
 import FilterTiltShiftRoundedIcon from '@material-ui/icons/FilterTiltShiftRounded';
 import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
-// import '../styles/UserForm.css';
 
-interface Props {
-  // drawerOpen: boolean;
+interface FilterFormProps {
   onSubmit: (values: UserConstraints) => void;
-  // updateDrawer: (open: boolean) => void;
+  filterButtonClass: string;
 }
 
 interface DrawerProps {
@@ -18,7 +16,7 @@ interface DrawerProps {
   updateDrawer: (open: boolean) => void;
 }
 
-interface State {
+interface FilterFormState {
   drawerOpen: boolean;
 }
 
@@ -117,9 +115,11 @@ const FormDrawer: React.FC<DrawerProps> = ({
   );
 };
 
-export class FilterForm extends React.Component<Props, State> {
-  // const [state, setState] = useState({ drawerOpen: false });
-  constructor(props: Props) {
+export class FilterForm extends React.Component<
+  FilterFormProps,
+  FilterFormState
+> {
+  constructor(props: FilterFormProps) {
     super(props);
     this.state = {
       drawerOpen: false,
@@ -136,8 +136,9 @@ export class FilterForm extends React.Component<Props, State> {
     return (
       <div>
         <Button
-          className="filterButton"
-          variant="contained"
+          className={this.props.filterButtonClass}
+          variant="outlined"
+          color="secondary"
           onClick={() => {
             this.updateDrawer(true);
           }}
