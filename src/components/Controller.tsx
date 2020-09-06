@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { CustomMap } from './CustomMap';
 import { CustomHeader } from './CustomHeader';
+import { SpotifyReader } from '../model/aggregators/libraryReader/SpotifyReader';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -37,6 +38,9 @@ export class Controller extends React.Component<Props, State> {
     // setTimeout(() => {
     //   this.setState({ userConstraints: newConstraints });
     // }, 5000);
+    const spotifyReader = new SpotifyReader();
+    spotifyReader.authenticate();
+    console.log('hello');
   }
 
   updateUserContstraints(newConstraints: UserConstraints) {
