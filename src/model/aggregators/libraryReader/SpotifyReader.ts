@@ -1,6 +1,8 @@
 import { MusicLibraryReader } from './MusicLibraryReader';
 import { hashParamsExist, getHashParams } from '../../utils';
-import { StreamingService } from '../../../components/Controller';
+import axios, { AxiosResponse } from 'axios';
+
+const savedTracksEndpoint = 'https://api.spotify.com/v1/me/tracks';
 
 export class SpotifyReader extends MusicLibraryReader {
   private redirectUri = 'http://localhost:3000/'; // TODO: change this to real prod URL
@@ -31,11 +33,29 @@ export class SpotifyReader extends MusicLibraryReader {
   }
 
   fetchArtists(): string[] {
+    this.fetchSavedTracksArtists();
     return [];
   }
 
   private getToken(): void {
     if (hashParamsExist()) this.token = getHashParams().access_token;
+  }
+
+  private fetchSavedTracksArtists(): string[] {
+    console.log('get request');
+    axios
+      .get(savedTracksEndpoint, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response: AxiosResponse): void => {
+        console.log(response.data);
+      });
+
+    return [];
   }
 
   // for Spotify "state" param - for security
@@ -54,6 +74,11 @@ export class SpotifyReader extends MusicLibraryReader {
   }
 
   static spotifyUserIsLoggedIn(): boolean {
-    return hashParamsExist() /* && spotifyTestApiCallWorks() */;
+    return (
+      hashParamsExist() &&
+      Object.keys(getHashParams()).includes(
+        'access_token'
+      ) /* && spotifyTestApiCallWorks() */
+    );
   }
 }

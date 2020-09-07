@@ -33,6 +33,7 @@ export class Controller extends React.Component<Props, State> {
     var libraryReader = null;
     if (streamingService === StreamingService.Spotify) {
       libraryReader = new SpotifyReader();
+      libraryReader.fetchArtists();
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo
     } else {
