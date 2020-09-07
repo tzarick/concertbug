@@ -1,43 +1,29 @@
 import { MusicLibraryReader } from './MusicLibraryReader';
 
-type UrlParam = {
-  [key: string]: string;
-};
-
 export class SpotifyReader extends MusicLibraryReader {
   private redirectUri = 'http://localhost:3000/'; // TODO: change this to real prod URL
 
-  public authenticate(): boolean {
+  authorizeUrl = '';
+
+  authenticate(): boolean {
     const stateKey = this.generateRandomString(16);
     const scope = 'user-library-read playlist-read-private user-top-read'; // add more scopes here if needed
     const spotifyAuthUrl = 'https://accounts.spotify.com/authorize';
 
-    const fullUrl = this.buildFullUrl(spotifyAuthUrl, [
+    this.authorizeUrl = this.buildFullUrl(spotifyAuthUrl, [
       { response_type: 'token' },
       { client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID as string },
       { scope: scope },
       { redirect_uri: this.redirectUri },
       { state: stateKey },
-      { show_dialog: 'true' },
+      { show_dialog: 'true' }, // this is nice to have for testing to verify it works, not necessary for prod
     ]);
 
     return true;
   }
 
-  public fetchArtists(): string[] {
+  fetchArtists(): string[] {
     return [];
-  }
-
-  private buildFullUrl(baseUrl: string, params: UrlParam[]): string {
-    params.forEach((param, i) => {
-      const [key] = Object.keys(param);
-      const [value] = Object.values(param);
-
-      baseUrl += i === 0 ? '?' : '&';
-      baseUrl += `${key}=${encodeURIComponent(value)}`;
-    });
-
-    return baseUrl;
   }
 
   // for Spotify "state" param - for security

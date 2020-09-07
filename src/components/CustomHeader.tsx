@@ -1,17 +1,20 @@
 import React from 'react';
 import { ServiceSelectionMenu } from './ServiceSelectionMenu';
-import { UserConstraints } from './Controller';
+import { UserConstraints, StreamingService } from './Controller';
 import { Grid } from '@material-ui/core';
 import BugBannerPath from '../styles/images/CBLogo.png';
 import { FilterForm } from './FilterForm';
 import { gridStyles } from '../styles/gridStyles';
+import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
 
 interface Props {
   onFilterConstraintsSubmit: (constraints: UserConstraints) => void;
+  onStreamingServiceSelect: (reader: MusicLibraryReader) => void;
 }
 
 export const CustomHeader: React.FC<Props> = ({
   onFilterConstraintsSubmit,
+  onStreamingServiceSelect,
 }) => {
   const classes = gridStyles();
 
@@ -23,7 +26,7 @@ export const CustomHeader: React.FC<Props> = ({
         alt="Concert Bug"
         height="45"
         onClick={() => {
-          console.log('logo click');
+          console.log('nice logo click');
         }}
       />
       <Grid
@@ -36,6 +39,7 @@ export const CustomHeader: React.FC<Props> = ({
         <Grid item>
           <ServiceSelectionMenu
             buttonClassName={`${classes.headerItem} ${classes.menuButton}`}
+            onStreamingServiceSelect={onStreamingServiceSelect}
           />
         </Grid>
         <Grid className={classes.headerItem} item>

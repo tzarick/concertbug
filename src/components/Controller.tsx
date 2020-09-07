@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { CustomMap } from './CustomMap';
 import { CustomHeader } from './CustomHeader';
 import { SpotifyReader } from '../model/aggregators/libraryReader/SpotifyReader';
+import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -9,17 +10,26 @@ export interface UserConstraints {
   endDate: Date;
 }
 
+export enum StreamingService {
+  Spotify,
+  AppleMusic,
+}
+
 interface Props {}
 
 interface State {
   userConstraints: UserConstraints;
   filterDrawerOpen: boolean;
+  libraryReader: MusicLibraryReader | null;
 }
 
 export class Controller extends React.Component<Props, State> {
+  // libraryReader: MusicLibraryReader | null = null;
+
   constructor(props: Props) {
     super(props);
     this.state = {
+      libraryReader: null,
       filterDrawerOpen: false,
       userConstraints: {
         distanceRadius: 500,
@@ -38,18 +48,31 @@ export class Controller extends React.Component<Props, State> {
     // setTimeout(() => {
     //   this.setState({ userConstraints: newConstraints });
     // }, 5000);
-    const spotifyReader = new SpotifyReader();
-    spotifyReader.authenticate();
-    console.log('hello');
   }
 
   updateUserContstraints(newConstraints: UserConstraints) {
     this.setState({
+      ...this.state,
       userConstraints: newConstraints,
     });
   }
 
+  onStreamingServiceSelect = (reader: MusicLibraryReader): void => {
+    this.setState({
+      ...this.state,
+      libraryReader: reader,
+    });
+  };
+
   public render(): JSX.Element {
+    if (this.state.libraryReader) {
+      // user has already logged in successfully
+      console.log('asdf');
+      console.log('logged in');
+    } else {
+      console.log(MusicLibraryReader.getHashParams());
+      console.log('not logged in');
+    }
     return (
       <div className="controller">
         <CustomHeader
@@ -57,6 +80,7 @@ export class Controller extends React.Component<Props, State> {
             console.log(constraints);
             this.updateUserContstraints(constraints);
           }}
+          onStreamingServiceSelect={this.onStreamingServiceSelect}
         />
         <CustomMap divId="map" />
       </div>
