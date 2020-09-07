@@ -2,11 +2,22 @@ import { MusicLibraryReader } from './MusicLibraryReader';
 import { hashParamsExist, getHashParams } from '../../utils';
 import axios, { AxiosResponse } from 'axios';
 
-const savedTracksEndpoint = 'https://api.spotify.com/v1/me/tracks';
+interface spotifyTrackObject {
+  track: {
+    artists: [
+      {
+        name: string;
+      }
+    ];
+  };
+}
+
+const savedTracksEndpoint = 'https://api.spotify.com/v1/me/tracks?limit=50';
 
 export class SpotifyReader extends MusicLibraryReader {
   private redirectUri = 'http://localhost:3000/'; // TODO: change this to real prod URL
   private token = '';
+  private artists: string[] = [];
   authorizeUrl = '';
 
   constructor() {
@@ -32,8 +43,9 @@ export class SpotifyReader extends MusicLibraryReader {
     return true;
   }
 
-  fetchArtists(): string[] {
-    this.fetchSavedTracksArtists();
+  async fetchArtists(): Promise<string[]> {
+    console.log(await this.fetchSavedTracksArtists());
+
     return [];
   }
 
@@ -41,10 +53,13 @@ export class SpotifyReader extends MusicLibraryReader {
     if (hashParamsExist()) this.token = getHashParams().access_token;
   }
 
-  private fetchSavedTracksArtists(): string[] {
-    console.log('get request');
-    axios
-      .get(savedTracksEndpoint, {
+  private async fetchSavedTracksArtistsBatch(
+    url: string
+  ): Promise<string | null> {
+    // var trackArtistsArray: string[] = [];
+    var next: string | null = null; // if null, no more -> can stop
+    await axios
+      .get(url, {
         headers: {
           Authorization: `Bearer ${this.token}`,
           Accept: 'application/json',
@@ -52,10 +67,30 @@ export class SpotifyReader extends MusicLibraryReader {
         },
       })
       .then((response: AxiosResponse): void => {
-        console.log(response.data);
+        next = response.data.next;
+
+        const artists = response.data.items
+          .map((item: spotifyTrackObject) =>
+            item.track.artists.map((item) => item.name)
+          ) // grab all artists on each track
+          .reduce((array: string[], item: string[]) => [...array, ...item], []); // collapse nested arrays
+
+        const trackArtistsSet = new Set<string>([...this.artists, ...artists]); // no duplicates pls
+        this.artists = [...trackArtistsSet]; // back to an array with no duplicates
       });
 
-    return [];
+    return next;
+  }
+
+  private async fetchSavedTracksArtists(): Promise<string[]> {
+    var endpointUrl = await this.fetchSavedTracksArtistsBatch(
+      savedTracksEndpoint
+    );
+    while (endpointUrl !== null) {
+      endpointUrl = await this.fetchSavedTracksArtistsBatch(endpointUrl);
+    }
+
+    return this.artists;
   }
 
   // for Spotify "state" param - for security
