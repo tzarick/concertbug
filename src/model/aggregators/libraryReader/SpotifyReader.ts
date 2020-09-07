@@ -1,9 +1,16 @@
 import { MusicLibraryReader } from './MusicLibraryReader';
+import { hashParamsExist, getHashParams } from '../../utils';
+import { StreamingService } from '../../../components/Controller';
 
 export class SpotifyReader extends MusicLibraryReader {
   private redirectUri = 'http://localhost:3000/'; // TODO: change this to real prod URL
-
+  private token = '';
   authorizeUrl = '';
+
+  constructor() {
+    super();
+    this.getToken(); // this is for when we come back to home after authentication - otherwise, do nothing
+  }
 
   authenticate(): boolean {
     const stateKey = this.generateRandomString(16);
@@ -17,6 +24,7 @@ export class SpotifyReader extends MusicLibraryReader {
       { redirect_uri: this.redirectUri },
       { state: stateKey },
       { show_dialog: 'true' }, // this is nice to have for testing to verify it works, not necessary for prod
+      { service: 'spotify' },
     ]);
 
     return true;
@@ -24,6 +32,10 @@ export class SpotifyReader extends MusicLibraryReader {
 
   fetchArtists(): string[] {
     return [];
+  }
+
+  private getToken(): void {
+    if (hashParamsExist()) this.token = getHashParams().access_token;
   }
 
   // for Spotify "state" param - for security
@@ -39,5 +51,9 @@ export class SpotifyReader extends MusicLibraryReader {
     }
 
     return text;
+  }
+
+  static spotifyUserIsLoggedIn(): boolean {
+    return hashParamsExist() /* && spotifyTestApiCallWorks() */;
   }
 }

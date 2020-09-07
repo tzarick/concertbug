@@ -1,3 +1,6 @@
+import { SpotifyReader } from './SpotifyReader';
+import { StreamingService } from '../../../components/Controller';
+
 type UrlParam = {
   [key: string]: string;
 };
@@ -19,16 +22,14 @@ export abstract class MusicLibraryReader {
     return baseUrl;
   }
 
-  static getHashParams(): { [key: string]: string } {
-    const hash = window.location.hash.substr(1); // without the '#'
-    return hash.split('&').reduce((obj, item) => {
-      // put all params in an object
-      const [key, value] = item.split('=');
-      return { ...obj, [key]: value };
-    }, {});
-  }
+  static getStreamingService(): StreamingService | null {
+    if (SpotifyReader.spotifyUserIsLoggedIn()) {
+      return StreamingService.Spotify;
+    }
+    // else if (AppleMusicReader.appleUserIsLoggedIn()) { // todo
+    //  return StreamingService.AppleMusic;
+    // }
 
-  static hashParamsExist(): boolean {
-    return this.getHashParams() !== undefined;
+    return null;
   }
 }

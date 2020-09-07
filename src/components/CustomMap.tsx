@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import '../styles/CustomMap.css';
 import { CustomMapModel } from '../model/CustomMapModel';
+import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
 
 // import { Map, GoogleApiWrapper, GoogleAPI } from 'google-maps-react';
 // import { CustomMapModel } from '../model/CustomMapModel';
 
 interface Props {
   divId: string;
+  libraryReader: MusicLibraryReader | null;
   // onMapLoad: (map: google.maps.Map) => void;
   // apiKey: string;
 }
@@ -42,7 +44,7 @@ export class CustomMap extends React.Component<Props, State> {
   };
 
   render(): JSX.Element {
-    if (this.map) {
+    if (this.map && this.props.libraryReader) {
       this.map.clearMarkers();
       // this.map.setCenter(this.state.mapCenter); // instead of re-centering here we would get the new list of concerts / generate new markers based on the changed inputs
 

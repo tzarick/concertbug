@@ -28,8 +28,19 @@ export class Controller extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+    // this is necessary because of the uri redirect after auth - our state gets wiped
+    const streamingService = MusicLibraryReader.getStreamingService();
+    var libraryReader = null;
+    if (streamingService === StreamingService.Spotify) {
+      libraryReader = new SpotifyReader();
+    } else if (streamingService === StreamingService.AppleMusic) {
+      // todo
+    } else {
+      console.log('not logged in');
+    }
+
     this.state = {
-      libraryReader: null,
+      libraryReader: libraryReader,
       filterDrawerOpen: false,
       userConstraints: {
         distanceRadius: 500,
@@ -39,16 +50,7 @@ export class Controller extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    // const newConstraints = {
-    //   distanceRadius: 50,
-    //   dateStart: new Date(),
-    //   dateEnd: new Date(),
-    // };
-    // setTimeout(() => {
-    //   this.setState({ userConstraints: newConstraints });
-    // }, 5000);
-  }
+  componentDidMount() {}
 
   updateUserContstraints(newConstraints: UserConstraints) {
     this.setState({
@@ -65,14 +67,6 @@ export class Controller extends React.Component<Props, State> {
   };
 
   public render(): JSX.Element {
-    if (this.state.libraryReader) {
-      // user has already logged in successfully
-      console.log('asdf');
-      console.log('logged in');
-    } else {
-      console.log(MusicLibraryReader.getHashParams());
-      console.log('not logged in');
-    }
     return (
       <div className="controller">
         <CustomHeader
@@ -82,7 +76,7 @@ export class Controller extends React.Component<Props, State> {
           }}
           onStreamingServiceSelect={this.onStreamingServiceSelect}
         />
-        <CustomMap divId="map" />
+        <CustomMap libraryReader={this.state.libraryReader} divId="map" />
       </div>
     );
   }
