@@ -43,10 +43,10 @@ export class SpotifyReader extends MusicLibraryReader {
     return true;
   }
 
-  async fetchArtists(): Promise<string[]> {
+  async fetchArtists(): Promise<boolean> {
     console.log(await this.fetchSavedTracksArtists());
 
-    return [];
+    return true;
   }
 
   private getToken(): void {
@@ -79,7 +79,7 @@ export class SpotifyReader extends MusicLibraryReader {
         this.artists = [...trackArtistsSet]; // back to an array with no duplicates
       });
 
-    return next;
+    return next; // next url endpoint of next batch
   }
 
   private async fetchSavedTracksArtists(): Promise<string[]> {

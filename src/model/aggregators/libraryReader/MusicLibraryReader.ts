@@ -8,7 +8,7 @@ type UrlParam = {
 export abstract class MusicLibraryReader {
   public authorizeUrl: string = '';
   abstract authenticate(): boolean;
-  abstract async fetchArtists(): Promise<string[]>;
+  abstract async fetchArtists(): Promise<boolean>;
 
   protected buildFullUrl(baseUrl: string, params: UrlParam[]): string {
     params.forEach((param, i) => {
