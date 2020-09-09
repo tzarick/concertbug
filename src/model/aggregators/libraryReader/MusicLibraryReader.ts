@@ -5,10 +5,16 @@ type UrlParam = {
   [key: string]: string;
 };
 
+export interface artistInfo {
+  name: string;
+  id: string;
+}
+
 export abstract class MusicLibraryReader {
   public authorizeUrl: string = '';
   abstract authenticate(): boolean;
-  abstract async fetchArtists(): Promise<boolean>;
+  abstract async fetchArtists(): Promise<artistInfo[]>;
+  abstract async getPreviewUri(artistId: string): Promise<string | null>;
 
   protected buildFullUrl(baseUrl: string, params: UrlParam[]): string {
     params.forEach((param, i) => {

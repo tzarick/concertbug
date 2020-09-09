@@ -1,4 +1,4 @@
-import { MusicLibraryReader } from './MusicLibraryReader';
+import { MusicLibraryReader, artistInfo } from './MusicLibraryReader';
 import { hashParamsExist, getHashParams } from '../../utils';
 import axios, { AxiosResponse } from 'axios';
 
@@ -7,6 +7,7 @@ interface spotifyTrackObject {
     artists: [
       {
         name: string;
+        id: string;
       }
     ];
   };
@@ -17,7 +18,7 @@ const savedTracksEndpoint = 'https://api.spotify.com/v1/me/tracks?limit=50';
 export class SpotifyReader extends MusicLibraryReader {
   private redirectUri = 'http://localhost:3000/'; // TODO: change this to real prod URL
   private token = '';
-  private artists: string[] = [];
+  private artists: artistInfo[] = [];
   authorizeUrl = '';
 
   constructor() {
@@ -43,10 +44,27 @@ export class SpotifyReader extends MusicLibraryReader {
     return true;
   }
 
-  async fetchArtists(): Promise<boolean> {
-    console.log(await this.fetchSavedTracksArtists());
+  async fetchArtists(): Promise<artistInfo[]> {
+    const savedTracksArtists = await this.fetchSavedTracksArtists();
+    return savedTracksArtists;
+  }
 
-    return true;
+  async getPreviewUri(artistId: string): Promise<string | null> {
+    const topTracksEnpoint = `https://api.spotify.com/v1/artists/${artistId}/top-tracks?country=US`;
+    var uri: string | null = null;
+    await axios
+      .get(topTracksEnpoint, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response: AxiosResponse): void => {
+        uri = response.data.uri;
+      });
+
+    return uri;
   }
 
   private getToken(): void {
@@ -57,7 +75,7 @@ export class SpotifyReader extends MusicLibraryReader {
     url: string
   ): Promise<string | null> {
     // var trackArtistsArray: string[] = [];
-    var next: string | null = null; // if null, no more -> can stop
+    var next: string | null = null; // if null, no more tracks in lib -> can stop
     await axios
       .get(url, {
         headers: {
@@ -69,25 +87,50 @@ export class SpotifyReader extends MusicLibraryReader {
       .then((response: AxiosResponse): void => {
         next = response.data.next;
 
-        const artists = response.data.items
+        const artists: artistInfo[] = response.data.items
           .map((item: spotifyTrackObject) =>
-            item.track.artists.map((item) => item.name)
+            item.track.artists.map(
+              (artist): artistInfo => {
+                return { name: artist.name, id: artist.id };
+              }
+            )
           ) // grab all artists on each track
-          .reduce((array: string[], item: string[]) => [...array, ...item], []); // collapse nested arrays
+          .reduce(
+            (array: artistInfo[], item: artistInfo[]) => [...array, ...item],
+            []
+          ); // collapse nested arrays
 
-        const trackArtistsSet = new Set<string>([...this.artists, ...artists]); // no duplicates pls
-        this.artists = [...trackArtistsSet]; // back to an array with no duplicates
+        artists.forEach((artist: artistInfo) => {
+          // add only unique artists
+          if (this.artists.findIndex((item) => item.id === artist.id) === -1) {
+            this.artists.push(artist);
+          }
+        });
+
+        // const trackArtistsSet = new Set<artistInfo>([
+        //   ...this.artists,
+        //   ...artists,
+        // ]); // combine + no duplicates
+
+        // this.artists = [...trackArtistsSet]; // back to an array with no duplicates
+      })
+      .catch((e) => {
+        window.alert(
+          'This Spotify connection is a bit weak..\n\nIt might be us but.. Try logging in with your streaming service again to make sure :)'
+        );
       });
 
-    return next; // next url endpoint of next batch
+    return next; // next url endpoint of next batch (max limit per call is 50)
   }
 
-  private async fetchSavedTracksArtists(): Promise<string[]> {
-    var endpointUrl = await this.fetchSavedTracksArtistsBatch(
+  private async fetchSavedTracksArtists(): Promise<artistInfo[]> {
+    var nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
       savedTracksEndpoint
     );
-    while (endpointUrl !== null) {
-      endpointUrl = await this.fetchSavedTracksArtistsBatch(endpointUrl);
+    while (nextEndpointUrl !== null) {
+      nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
+        nextEndpointUrl
+      );
     }
 
     return this.artists;

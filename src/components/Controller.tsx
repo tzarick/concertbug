@@ -3,6 +3,7 @@ import { CustomMap } from './CustomMap';
 import { CustomHeader } from './CustomHeader';
 import { SpotifyReader } from '../model/aggregators/libraryReader/SpotifyReader';
 import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
+import { ArtistCollection } from '../model/artists/ArtistCollection';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -33,11 +34,15 @@ export class Controller extends React.Component<Props, State> {
     var libraryReader = null;
     if (streamingService === StreamingService.Spotify) {
       libraryReader = new SpotifyReader();
-      libraryReader.fetchArtists();
+      // libraryReader.fetchArtists();
+      const artistsCollection = new ArtistCollection(libraryReader);
+      artistsCollection.fillArtists().then((response) => {
+        console.log(artistsCollection.artists);
+      });
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo
     } else {
-      console.log('not logged in');
+      console.log('Not logged in');
     }
 
     this.state = {
