@@ -1,11 +1,12 @@
 import { ArtistCollection } from '../artists/ArtistCollection';
 import { Concert } from './Concert';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 
 export class ConcertCollection {
   private concerts: Concert[] = [];
   constructor(private artistCollection: ArtistCollection) {}
 
-  fetchConcerts(): Concert[] {
+  async fetchConcerts(): Promise<Concert[]> {
     return [];
   }
 

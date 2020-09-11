@@ -5,7 +5,7 @@ export class ArtistCollection {
   artists: Artist[] = [];
   constructor(private userLibAggregator: MusicLibraryReader) {}
 
-  async fillArtists(): Promise<void> {
+  async fillArtists(): Promise<Artist[]> {
     this.artists = await this.userLibAggregator.fetchArtists();
     // for (let artist of artists) {
     //   // const uri = await this.userLibAggregator.getPreviewUri(artist.id);
@@ -14,6 +14,7 @@ export class ArtistCollection {
     //     songPreviewUri: null, // we hit the max request limit if we do this now. fill later
     //   });
     // }
+    return this.artists;
   }
 
   // an alternative: this static method could work but seems a little less flexible

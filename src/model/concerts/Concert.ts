@@ -1,6 +1,13 @@
+import { Artist } from '../artists/Artist';
+
+type ConcertArtist = {
+  spotifyDetails: Artist;
+  songkickId: string;
+};
+
 // export class Concert {}
 export type Concert = {
-  artistName: string;
+  artist: ConcertArtist;
   date: Date;
   ticketLink: string;
   ticketsAvailable: boolean;

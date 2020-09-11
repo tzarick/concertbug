@@ -4,6 +4,8 @@ import { CustomHeader } from './CustomHeader';
 import { SpotifyReader } from '../model/aggregators/libraryReader/SpotifyReader';
 import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
 import { ArtistCollection } from '../model/artists/ArtistCollection';
+import { ConcertCollection } from '../model/concerts/ConcertCollection';
+import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -36,8 +38,13 @@ export class Controller extends React.Component<Props, State> {
       libraryReader = new SpotifyReader();
       // libraryReader.fetchArtists();
       const artistsCollection = new ArtistCollection(libraryReader);
+      // artistsCollection.fillArtists().then((response) => {
+      //   console.log(artistsCollection.artists);
+      // });
       artistsCollection.fillArtists().then((response) => {
-        console.log(artistsCollection.artists);
+        console.log(response);
+        const concertReader = new SongkickReader();
+        concertReader.fetchArtistIDs(response);
       });
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo
