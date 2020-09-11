@@ -1,6 +1,9 @@
 import { MusicLibraryReader, artistInfo } from './MusicLibraryReader';
 import { hashParamsExist, getHashParams } from '../../utils';
 import axios, { AxiosResponse } from 'axios';
+import lodash from 'lodash';
+
+const _ = lodash;
 
 interface spotifyTrackObject {
   track: {
@@ -124,16 +127,120 @@ export class SpotifyReader extends MusicLibraryReader {
   }
 
   private async fetchSavedTracksArtists(): Promise<artistInfo[]> {
-    var nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
-      savedTracksEndpoint
+    const totalTracks = await this.getTotalTrackCount();
+    const endpoints = this.generateSavedTracksEndpoints(totalTracks);
+
+    // all batches at once
+    const savedTrackBatchPromises = endpoints.map(async (endpoint) => {
+      return await axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+    });
+
+    const responses: AxiosResponse[] = await Promise.all(
+      savedTrackBatchPromises
+    ); // all responses at once
+    const artistBatches = responses.map((response: AxiosResponse) =>
+      this.getArtistsFromTracksBatch(response)
     );
-    while (nextEndpointUrl !== null) {
-      nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
-        nextEndpointUrl
+
+    const artists = _.flatten(artistBatches);
+
+    artists.forEach((artist: artistInfo) => {
+      // add only unique artists
+      if (this.artists.findIndex((item) => item.id === artist.id) === -1) {
+        this.artists.push(artist);
+      }
+    });
+
+    // var nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
+    //   savedTracksEndpoint
+    // );
+    // while (nextEndpointUrl !== null) {
+    //   nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
+    //     nextEndpointUrl
+    //   );
+    // }
+
+    return this.artists;
+  }
+
+  private getArtistsFromTracksBatch(tracksBatch: AxiosResponse) {
+    const artists: artistInfo[] = tracksBatch.data.items.map(
+      (item: spotifyTrackObject) =>
+        item.track.artists.map(
+          (artist): artistInfo => {
+            return { name: artist.name, id: artist.id };
+          }
+        )
+    ); // grab all artists on each track
+
+    return _.flatten(artists);
+  }
+
+  private requestTracksBatch(offset: number, limit: number) {
+    return axios.get(
+      `https://api.spotify.com/v1/me/tracks?offset=${offset}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }
+
+  // total tracks in "Saved Songs" list
+  private async getTotalTrackCount(): Promise<number> {
+    try {
+      const response: AxiosResponse = await axios.get(savedTracksEndpoint, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const {
+        data: { total },
+      } = response;
+      console.log(`Total tracks in \"Saved Tracks\": ${total}`);
+
+      return total;
+    } catch {
+      window.alert(
+        'This Spotify connection is a bit weak..\n\nIt might be us but.. Try logging in with your streaming service again to make sure :)'
       );
     }
 
-    return this.artists;
+    return 0;
+  }
+
+  // get an enpoint for each paginated response based on the library size. Limit per call = 50.
+  // So that we can expedite this fetch process in parallel if there are lots of songs in a lib (like mine..)
+  private generateSavedTracksEndpoints(trackCount: number): string[] {
+    const limitPerResponse = 50;
+    const numberOfCallsNeeded = Math.ceil(trackCount / limitPerResponse);
+
+    let endpoints: string[] = [];
+    for (let i = 0; i < numberOfCallsNeeded; i++) {
+      endpoints.push(
+        `https://api.spotify.com/v1/me/tracks?offset=${
+          i * limitPerResponse
+        }&limit=${limitPerResponse}`
+      );
+    }
+    // let offsets: number[] = [];
+    // for (let i = 0; i < numberOfCallsNeeded; i++) {
+    //   offsets.push(i * limitPerResponse);
+    // }
+
+    return endpoints;
   }
 
   // for Spotify "state" param - for security

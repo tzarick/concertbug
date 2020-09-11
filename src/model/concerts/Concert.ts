@@ -1,8 +1,8 @@
 import { Artist } from '../artists/Artist';
 
 type ConcertArtist = {
-  spotifyDetails: Artist;
-  songkickId: string;
+  streamingServiceDetails: Artist;
+  concertServiceId: string;
 };
 
 // export class Concert {}

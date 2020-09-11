@@ -2,10 +2,14 @@ import React, { Component } from 'react';
 import { CustomMap } from './CustomMap';
 import { CustomHeader } from './CustomHeader';
 import { SpotifyReader } from '../model/aggregators/libraryReader/SpotifyReader';
-import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
+import {
+  MusicLibraryReader,
+  artistInfo,
+} from '../model/aggregators/libraryReader/MusicLibraryReader';
 import { ArtistCollection } from '../model/artists/ArtistCollection';
 import { ConcertCollection } from '../model/concerts/ConcertCollection';
 import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
+import { AxiosResponse } from 'axios';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -36,16 +40,19 @@ export class Controller extends React.Component<Props, State> {
     var libraryReader = null;
     if (streamingService === StreamingService.Spotify) {
       libraryReader = new SpotifyReader();
+      libraryReader
+        .fetchArtists()
+        .then((response: artistInfo[]) => console.log(response));
       // libraryReader.fetchArtists();
-      const artistsCollection = new ArtistCollection(libraryReader);
+      // const artistsCollection = new ArtistCollection(libraryReader);
       // artistsCollection.fillArtists().then((response) => {
       //   console.log(artistsCollection.artists);
       // });
-      artistsCollection.fillArtists().then((response) => {
-        console.log(response);
-        const concertReader = new SongkickReader();
-        concertReader.fetchArtistIDs(response);
-      });
+      // artistsCollection.fillArtists().then((response) => {
+      //   console.log(response);
+      //   const concertReader = new SongkickReader();
+      //   concertReader.fetchArtistIDs(response);
+      // });
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo
     } else {
