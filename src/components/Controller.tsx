@@ -52,7 +52,7 @@ export class Controller extends React.Component<Props, State> {
       artistsCollection.fillArtists().then((response) => {
         console.log(response);
         const concertReader = new SongkickReader();
-        concertReader.fetchArtistIDs(response);
+        // concertReader.fetchArtistIDs(response);
       });
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo

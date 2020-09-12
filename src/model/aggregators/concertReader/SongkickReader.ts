@@ -30,8 +30,8 @@ export class SongkickReader extends ConcertDataReader {
   async fetchArtistIDs(artists: Artist[]): Promise<ConcertArtist[]> {
     // let info: ConcertArtist[] = [];
 
-    const concertInfoPromises = artists.map(async (artist) => {
-      return await axios.get(
+    const concertInfoPromises = artists.map((artist) => {
+      return axios.get(
         `https://api.songkick.com/api/3.0/search/artists.json?apikey=${process.env.REACT_APP_SONGKICK_API_KEY}&query=${artist.name}`,
         {
           params: {
@@ -61,7 +61,10 @@ export class SongkickReader extends ConcertDataReader {
     });
 
     const info = artistInfo.filter((item) => item) as ConcertArtist[]; // remove null
+    console.log('Unable to find on SongKick: ');
     console.log(this.artistsNotFound);
+
+    console.log(info);
     // for (let artist of artists) {
     //   let artistInfoEndpoint = `https://api.songkick.com/api/3.0/search/artists.json?apikey=${process.env.REACT_APP_SONGKICK_API_KEY}&query=${artist.name}`;
     //   await axios
