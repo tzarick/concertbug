@@ -5,10 +5,14 @@ import {
 } from './ConcertDataReader';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { Artist } from '../../artists/Artist';
+import lodash from 'lodash';
 
-interface songKickArtistResponse extends AxiosResponse {
+const _ = lodash;
+
+interface songKickArtistResponse {
   resultsPage: {
     results: {
+      event: [];
       artist: [
         {
           id: number; // songkick id
@@ -23,8 +27,71 @@ interface songKickArtistResponse extends AxiosResponse {
 
 export class SongkickReader extends ConcertDataReader {
   private artistsNotFound: string[] = [];
-  fetchConcertData(artistNames: Artist[]): rawConcertObj[] {
+  async fetchConcertData(artists: Artist[]): Promise<rawConcertObj[]> {
+    const concertDataPromises = artists.map((artist) => {
+      let concertDataEndpoint = `https://api.songkick.com/api/3.0/events.json?apikey=U6EzuX5YFdieotzL&artist_name=${encodeURIComponent(
+        artist.name
+      )}`;
+      return axios.get(concertDataEndpoint);
+    });
+
+    const responses: AxiosResponse[] = await Promise.all(concertDataPromises);
+    // console.log(responses);
+    // const allResponses = responses.map(
+    //   async (response, i) =>
+    //     await this.getAllPages(response.data, artists[i].name)
+    // );
+
+    let allResponses: songKickArtistResponse[][] = [];
+    for (let i = 0; i < responses.length; i++) {
+      const allPages = await this.getAllPages(
+        responses[i].data,
+        artists[i].name
+      );
+      allResponses.push(allPages);
+    }
+
+    const allResponsesClean = _.flatten(allResponses)
+      .map((item) => item.resultsPage.results)
+      .filter((item) => item.event);
+    console.log(allResponsesClean);
+    // const all = await Promise.all(responses);
+    // console.log(all);
+
+    // const concertInfo = responses.map((response, i) => {
+    //   console.log(artists[i]);
+    //   return response;
+    // });
+    // .filter((info) => info.totalEntries > info.perPage);
+    // const concertsRaw = responses.map((concert) => concert.data);
+
+    // console.log(concertsRaw);
     return [];
+  }
+
+  // if there are more results for this artist, get them
+  private async getAllPages(
+    data: songKickArtistResponse,
+    artistName: string
+  ): Promise<songKickArtistResponse[]> {
+    const {
+      resultsPage: { totalEntries, perPage },
+    } = data;
+    let results = [data]; // start with 1 object, the one we've already received
+
+    // if more pages of data exist
+    if (totalEntries > perPage) {
+      const totalPages = Math.ceil(totalEntries / perPage);
+      for (let i = 2; i < totalPages; i++) {
+        const response = await axios.get(
+          `https://api.songkick.com/api/3.0/events.json?apikey=U6EzuX5YFdieotzL&artist_name=${encodeURIComponent(
+            artistName
+          )}&page=${i}`
+        );
+        results.push(response.data);
+      }
+    }
+    return results;
   }
 
   async fetchArtistIDs(artists: Artist[]): Promise<ConcertArtist[]> {
@@ -52,9 +119,7 @@ export class SongkickReader extends ConcertDataReader {
     //     .catch(() => console.log(`skipped ${artist.name}`));
     // });
 
-    const responses: AxiosResponse[] = (await Promise.all(
-      concertInfoPromises
-    )) as AxiosResponse[];
+    const responses: AxiosResponse[] = await Promise.all(concertInfoPromises);
 
     const artistInfo = responses.map((response) => {
       return this.extractArtistInfo(response);

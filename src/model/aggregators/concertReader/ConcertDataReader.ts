@@ -12,7 +12,9 @@ export interface ConcertArtist {
 }
 
 export abstract class ConcertDataReader {
-  abstract fetchConcertData(artistNames: Artist[]): rawConcertObj[];
+  abstract async fetchConcertData(
+    artistNames: Artist[]
+  ): Promise<rawConcertObj[]>;
   abstract async fetchArtistIDs(
     artistNames: Artist[]
   ): Promise<ConcertArtist[]>;

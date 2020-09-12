@@ -131,8 +131,8 @@ export class SpotifyReader extends MusicLibraryReader {
     const endpoints = this.generateSavedTracksEndpoints(totalTracks);
 
     // all batches at once
-    const savedTrackBatchPromises = endpoints.map(async (endpoint) => {
-      return await axios.get(endpoint, {
+    const savedTrackBatchPromises = endpoints.map((endpoint) => {
+      return axios.get(endpoint, {
         headers: {
           Authorization: `Bearer ${this.token}`,
           Accept: 'application/json',
