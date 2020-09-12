@@ -74,57 +74,57 @@ export class SpotifyReader extends MusicLibraryReader {
     if (hashParamsExist()) this.token = getHashParams().access_token;
   }
 
-  private async fetchSavedTracksArtistsBatch(
-    url: string
-  ): Promise<string | null> {
-    // var trackArtistsArray: string[] = [];
-    var next: string | null = null; // if null, no more tracks in lib -> can stop
-    await axios
-      .get(url, {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((response: AxiosResponse): void => {
-        next = response.data.next;
+  // private async fetchSavedTracksArtistsBatch(
+  //   url: string
+  // ): Promise<string | null> {
+  //   // var trackArtistsArray: string[] = [];
+  //   var next: string | null = null; // if null, no more tracks in lib -> can stop
+  //   await axios
+  //     .get(url, {
+  //       headers: {
+  //         Authorization: `Bearer ${this.token}`,
+  //         Accept: 'application/json',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     })
+  //     .then((response: AxiosResponse): void => {
+  //       next = response.data.next;
 
-        const artists: artistInfo[] = response.data.items
-          .map((item: spotifyTrackObject) =>
-            item.track.artists.map(
-              (artist): artistInfo => {
-                return { name: artist.name, id: artist.id };
-              }
-            )
-          ) // grab all artists on each track
-          .reduce(
-            (array: artistInfo[], item: artistInfo[]) => [...array, ...item],
-            []
-          ); // collapse nested arrays
+  //       const artists: artistInfo[] = response.data.items
+  //         .map((item: spotifyTrackObject) =>
+  //           item.track.artists.map(
+  //             (artist): artistInfo => {
+  //               return { name: artist.name, id: artist.id };
+  //             }
+  //           )
+  //         ) // grab all artists on each track
+  //         .reduce(
+  //           (array: artistInfo[], item: artistInfo[]) => [...array, ...item],
+  //           []
+  //         ); // collapse nested arrays
 
-        artists.forEach((artist: artistInfo) => {
-          // add only unique artists
-          if (this.artists.findIndex((item) => item.id === artist.id) === -1) {
-            this.artists.push(artist);
-          }
-        });
+  //       artists.forEach((artist: artistInfo) => {
+  //         // add only unique artists
+  //         if (this.artists.findIndex((item) => item.id === artist.id) === -1) {
+  //           this.artists.push(artist);
+  //         }
+  //       });
 
-        // const trackArtistsSet = new Set<artistInfo>([
-        //   ...this.artists,
-        //   ...artists,
-        // ]); // combine + no duplicates
+  //       // const trackArtistsSet = new Set<artistInfo>([
+  //       //   ...this.artists,
+  //       //   ...artists,
+  //       // ]); // combine + no duplicates
 
-        // this.artists = [...trackArtistsSet]; // back to an array with no duplicates
-      })
-      .catch((e) => {
-        window.alert(
-          'This Spotify connection is a bit weak..\n\nIt might be us but.. Try logging in with your streaming service again to make sure :)'
-        );
-      });
+  //       // this.artists = [...trackArtistsSet]; // back to an array with no duplicates
+  //     })
+  //     .catch((e) => {
+  //       window.alert(
+  //         'This Spotify connection is a bit weak..\n\nIt might be us but.. Try logging in with your streaming service again to make sure :)'
+  //       );
+  //     });
 
-    return next; // next url endpoint of next batch (max limit per call is 50)
-  }
+  //   return next; // next url endpoint of next batch (max limit per call is 50)
+  // }
 
   private async fetchSavedTracksArtists(): Promise<artistInfo[]> {
     const totalTracks = await this.getTotalTrackCount();
@@ -182,19 +182,6 @@ export class SpotifyReader extends MusicLibraryReader {
     return _.flatten(artists);
   }
 
-  private requestTracksBatch(offset: number, limit: number) {
-    return axios.get(
-      `https://api.spotify.com/v1/me/tracks?offset=${offset}&limit=${limit}`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-  }
-
   // total tracks in "Saved Songs" list
   private async getTotalTrackCount(): Promise<number> {
     try {
@@ -235,10 +222,6 @@ export class SpotifyReader extends MusicLibraryReader {
         }&limit=${limitPerResponse}`
       );
     }
-    // let offsets: number[] = [];
-    // for (let i = 0; i < numberOfCallsNeeded; i++) {
-    //   offsets.push(i * limitPerResponse);
-    // }
 
     return endpoints;
   }

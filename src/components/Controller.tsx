@@ -40,19 +40,20 @@ export class Controller extends React.Component<Props, State> {
     var libraryReader = null;
     if (streamingService === StreamingService.Spotify) {
       libraryReader = new SpotifyReader();
-      libraryReader
-        .fetchArtists()
-        .then((response: artistInfo[]) => console.log(response));
+      // libraryReader
+      //   .fetchArtists()
+      //   .then((response: artistInfo[]) => console.log(response));
+
       // libraryReader.fetchArtists();
-      // const artistsCollection = new ArtistCollection(libraryReader);
+      const artistsCollection = new ArtistCollection(libraryReader);
       // artistsCollection.fillArtists().then((response) => {
       //   console.log(artistsCollection.artists);
       // });
-      // artistsCollection.fillArtists().then((response) => {
-      //   console.log(response);
-      //   const concertReader = new SongkickReader();
-      //   concertReader.fetchArtistIDs(response);
-      // });
+      artistsCollection.fillArtists().then((response) => {
+        console.log(response);
+        const concertReader = new SongkickReader();
+        concertReader.fetchArtistIDs(response);
+      });
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo
     } else {
