@@ -22,49 +22,46 @@ interface songKickArtistResponse extends AxiosResponse {
 }
 
 export class SongkickReader extends ConcertDataReader {
+  private artistsNotFound: string[] = [];
   fetchConcertData(artistNames: Artist[]): rawConcertObj[] {
     return [];
   }
 
   async fetchArtistIDs(artists: Artist[]): Promise<ConcertArtist[]> {
-    let artistIds: ConcertArtist[] = [];
-    let artistsNotFound: string[] = [];
-    // const concertInfoPromises = artists.map(async (artist) => {
-    //   return await axios
-    //     .get(
-    //       `https://api.songkick.com/api/3.0/search/artists.json?apikey=${process.env.REACT_APP_SONGKICK_API_KEY}&query=${artist.name}`,
-    //       {
-    //         headers: {
-    //           artistName: artist.name,
-    //         },
-    //       }
-    //     )
-    //     .catch(() => {
-    //       artistsNotFound.push(artist.name);
-    //     });
-    // });
+    // let info: ConcertArtist[] = [];
 
-    artists.map((artist) => {
-      axios
-        .get(
-          `https://api.songkick.com/api/3.0/search/artists.json?apikey=${process.env.REACT_APP_SONGKICK_API_KEY}&query=${artist.name}`
-        )
-        .then((response: AxiosResponse) => {
-          console.log(response.data.resultsPage.results.artist[0].id);
-        })
-        .catch(() => console.log(`skipped ${artist.name}`));
+    const concertInfoPromises = artists.map(async (artist) => {
+      return await axios.get(
+        `https://api.songkick.com/api/3.0/search/artists.json?apikey=${process.env.REACT_APP_SONGKICK_API_KEY}&query=${artist.name}`,
+        {
+          params: {
+            artistName: artist.name,
+          },
+        }
+      );
     });
 
-    // const responses: AxiosResponse[] = (await Promise.all(
-    //   concertInfoPromises
-    // )) as AxiosResponse[];
-
-    // const artistInfo = responses.map((response) => {
-    //   return this.extractArtistInfo(response);
+    // artists.map((artist) => {
+    //   axios
+    //     .get(
+    //       `https://api.songkick.com/api/3.0/search/artists.json?apikey=${process.env.REACT_APP_SONGKICK_API_KEY}&query=${artist.name}`
+    //     )
+    //     .then((response: AxiosResponse) => {
+    //       console.log(response.data.resultsPage.results.artist[0].id);
+    //     })
+    //     .catch(() => console.log(`skipped ${artist.name}`));
     // });
 
-    // console.log(artistInfo);
+    const responses: AxiosResponse[] = (await Promise.all(
+      concertInfoPromises
+    )) as AxiosResponse[];
 
+    const artistInfo = responses.map((response) => {
+      return this.extractArtistInfo(response);
+    });
+
+    const info = artistInfo.filter((item) => item) as ConcertArtist[]; // remove null
+    console.log(this.artistsNotFound);
     // for (let artist of artists) {
     //   let artistInfoEndpoint = `https://api.songkick.com/api/3.0/search/artists.json?apikey=${process.env.REACT_APP_SONGKICK_API_KEY}&query=${artist.name}`;
     //   await axios
@@ -85,12 +82,12 @@ export class SongkickReader extends ConcertDataReader {
     // console.log(artistIds);
     // console.log('artists not found: ');
     // console.log(artistsNotFound);
-    return artistIds;
+    return info;
   }
 
   private extractArtistInfo(response: AxiosResponse): ConcertArtist | null {
+    const artistName = response.config.params.artistName;
     try {
-      const artistName = response.headers.artistName;
       const artistId: songKickArtistResponse =
         response.data.resultsPage.results.artist[0].id;
       return {
@@ -98,7 +95,7 @@ export class SongkickReader extends ConcertDataReader {
         id: `${artistId}`,
       };
     } catch {
-      console.log(`skipped`);
+      this.artistsNotFound.push(artistName);
       return null;
     }
   }
