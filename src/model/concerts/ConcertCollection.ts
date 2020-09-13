@@ -7,6 +7,11 @@ import {
 import { Artist } from '../artists/Artist';
 import { getDistance } from 'geolib';
 
+interface UniqueConcertLocation {
+  location: google.maps.LatLng;
+  concerts: Concert[];
+}
+
 export class ConcertCollection {
   private concerts: Concert[] = [];
   constructor(private concertReader: ConcertDataReader) {}
@@ -17,7 +22,7 @@ export class ConcertCollection {
       this.concerts.push(
         ...this.buildConcertsForArtist(
           concert,
-          new google.maps.LatLng(39.9612, -82.9988)
+          new google.maps.LatLng(39.9612, -82.9988) // TODO change this to dynamic center point
         )
       );
     });
@@ -25,8 +30,44 @@ export class ConcertCollection {
     return this.concerts;
   }
 
-  getElligibleConcerts(): Concert[] {
-    return [];
+  getElligibleConcertLocations(
+    maxDistance: number,
+    startDate: Date,
+    endDate: Date
+  ): UniqueConcertLocation[] {
+    const elligibleConcerts = this.concerts.filter(
+      (concert) =>
+        concert.distanceAway < maxDistance &&
+        concert.date > startDate &&
+        concert.date < endDate
+    );
+
+    return this.getUniqueConcertLocations(elligibleConcerts);
+  }
+
+  // put all concerts that are at the same location into the same marker so we can see them all still (stack info contents later)
+  private getUniqueConcertLocations(
+    elligibleConcerts: Concert[]
+  ): UniqueConcertLocation[] {
+    const uniqueLocations: UniqueConcertLocation[] = [];
+    for (let concert of elligibleConcerts) {
+      // have already added this location
+      const existingIndex = uniqueLocations.findIndex(
+        (item) =>
+          item.location.lat() === concert.venue.location.lat() &&
+          item.location.lng() === concert.venue.location.lng()
+      );
+      if (existingIndex === -1) {
+        uniqueLocations.push({
+          location: concert.venue.location,
+          concerts: [concert],
+        });
+      } else {
+        uniqueLocations[existingIndex].concerts.push(concert);
+      }
+    }
+
+    return uniqueLocations;
   }
 
   private distanceAway(
