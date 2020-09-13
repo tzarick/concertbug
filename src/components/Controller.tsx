@@ -51,7 +51,8 @@ export class Controller extends React.Component<Props, State> {
       artistsCollection.fillArtists().then((response) => {
         console.log(response);
         const concertReader = new SongkickReader();
-        concertReader.fetchConcertData(response).then((response) => {
+        const concertCollection = new ConcertCollection(concertReader);
+        concertCollection.fetchConcerts(response).then((response) => {
           console.log(response);
         });
       });
@@ -65,7 +66,7 @@ export class Controller extends React.Component<Props, State> {
       libraryReader: libraryReader,
       filterDrawerOpen: false,
       userConstraints: {
-        distanceRadius: 500,
+        distanceRadius: 2000,
         startDate: new Date(), // now, as default start
         endDate: new Date('2100-01-01'), // far in the future, as default end
       },

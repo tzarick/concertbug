@@ -115,9 +115,12 @@ export class SongkickReader extends ConcertDataReader {
       type: event.type,
       date: new Date(event.start.datetime),
       venue: {
-        name: event.venue ? event.venue.displayName : 'Unknown Venue',
-        lat: event.venue ? event.venue.lat : -1,
-        lng: event.venue ? event.venue.lng : -1,
+        name:
+          event.venue && event.venue.displayName
+            ? event.venue.displayName
+            : 'Unknown Venue',
+        lat: event.venue && event.venue.lat ? event.venue.lat : -1,
+        lng: event.venue && event.venue.lng ? event.venue.lng : -1,
       },
       bill: bill,
     };

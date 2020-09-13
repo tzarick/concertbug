@@ -29,7 +29,7 @@ const FormDrawer: React.FC<DrawerProps> = ({
   return (
     <Formik
       initialValues={{
-        distanceRadius: 500,
+        distanceRadius: 2000,
         startDate: new Date(),
         endDate: new Date('2100-01-01'),
       }}
