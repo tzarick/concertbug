@@ -9,7 +9,6 @@ import {
 import { ArtistCollection } from '../model/artists/ArtistCollection';
 import { ConcertCollection } from '../model/concerts/ConcertCollection';
 import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
-import { AxiosResponse } from 'axios';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -52,7 +51,9 @@ export class Controller extends React.Component<Props, State> {
       artistsCollection.fillArtists().then((response) => {
         console.log(response);
         const concertReader = new SongkickReader();
-        concertReader.fetchConcertData(response);
+        concertReader.fetchConcertData(response).then((response) => {
+          console.log(response);
+        });
       });
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo

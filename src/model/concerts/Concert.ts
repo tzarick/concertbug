@@ -6,12 +6,15 @@ type ConcertArtist = {
 };
 
 // export class Concert {}
-export type Concert = {
-  artist: ConcertArtist;
+export interface Concert {
+  artist: string;
   date: Date;
   ticketLink: string;
   ticketsAvailable: boolean;
-  songPreviewUri: string;
-  location: google.maps.LatLng;
+  songPreviewUri: string | null;
+  venue: {
+    name: string;
+    location: google.maps.LatLng;
+  };
   distanceAway: number;
-};
+}

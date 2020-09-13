@@ -13,6 +13,7 @@ const _ = lodash;
 
 export class SongkickReader extends ConcertDataReader {
   private artistsNotFound: string[] = [];
+
   async fetchConcertData(artists: Artist[]): Promise<RawConcertObj[]> {
     const concertDataPromises = artists.map((artist) => {
       let concertDataEndpoint = `https://api.songkick.com/api/3.0/events.json?apikey=U6EzuX5YFdieotzL&artist_name=${encodeURIComponent(
@@ -28,7 +29,7 @@ export class SongkickReader extends ConcertDataReader {
     //     await this.getAllPages(response.data, artists[i].name)
     // );
 
-    // get next pages of responses if necessary
+    // get next pages of responses if necessary, and condense / extract relevant info
     let allResponses: RawConcertObj[] = [];
     for (let i = 0; i < responses.length; i++) {
       const allPages = await this.getAllPages(
@@ -48,7 +49,7 @@ export class SongkickReader extends ConcertDataReader {
     const concertInfo = allResponses.filter(
       (item) => item.concertInfo.length > 0
     );
-    console.log(concertInfo);
+    // console.log(concertInfo);
     // const allResponsesClean =
     //   .map((item) => item.resultsPage.results)
     //   .filter((item) => item.event);
@@ -66,7 +67,7 @@ export class SongkickReader extends ConcertDataReader {
     // const concertsRaw = responses.map((concert) => concert.data);
 
     // console.log(concertsRaw);
-    return [];
+    return concertInfo;
   }
 
   private condenseAndExtractRelevantConcertInfo(
@@ -122,7 +123,8 @@ export class SongkickReader extends ConcertDataReader {
     };
   }
 
-  // if there are more results for this artist, get them
+  // if there are more results for this artist, get them all and wait for them to return
+  // waiting should happen very infrequently (only if an artist has more than 50 upcoming shows)
   private async getAllPages(
     data: SongKickResponse,
     artistName: string
