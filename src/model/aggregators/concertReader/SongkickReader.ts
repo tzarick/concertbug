@@ -24,7 +24,7 @@ export class SongkickReader extends ConcertDataReader {
 
     const responses: AxiosResponse[] = await Promise.all(concertDataPromises);
 
-    console.log(responses);
+    // console.log(responses);
     // const allResponses = responses.map(
     //   async (response, i) =>
     //     await this.getAllPages(response.data, artists[i].name)
@@ -111,24 +111,7 @@ export class SongkickReader extends ConcertDataReader {
             .filter((item) => item !== artistName)
         : [];
 
-    let datetime = null;
-    if (event.start.date) {
-      datetime = new Date(event.start.date.replace(/-/g, '/')); // format with slash instead of dash - workaround to get correct date using Date()
-      if (event.start.time) {
-        // manually add time - workaround to get correct date using Date()
-        const time = event.start.time;
-        const hour = parseInt(event.start.time.slice(0, time.indexOf(':')));
-        const min = parseInt(
-          event.start.time.slice(time.indexOf(':') + 1, time.lastIndexOf(':'))
-        );
-        const sec = parseInt(
-          event.start.time.slice(time.lastIndexOf(':') + 1, time.length)
-        );
-        datetime.setHours(hour);
-        datetime.setMinutes(min);
-        datetime.setSeconds(sec);
-      }
-    }
+    const datetime = this.getDatetime(event.start.date, event.start.time);
 
     return {
       title: event.displayName,
@@ -145,6 +128,28 @@ export class SongkickReader extends ConcertDataReader {
       },
       bill: bill,
     };
+  }
+
+  private getDatetime(date: string, time: string): Date | null {
+    let datetime = null;
+    if (date) {
+      datetime = new Date(date.replace(/-/g, '/')); // format with slash instead of dash - workaround to get correct date using Date()
+      if (time) {
+        // manually add time - workaround to get correct date using Date()
+        const hour = parseInt(time.slice(0, time.indexOf(':')));
+        const min = parseInt(
+          time.slice(time.indexOf(':') + 1, time.lastIndexOf(':'))
+        );
+        const sec = parseInt(
+          time.slice(time.lastIndexOf(':') + 1, time.length)
+        );
+        datetime.setHours(hour);
+        datetime.setMinutes(min);
+        datetime.setSeconds(sec);
+      }
+    }
+
+    return datetime;
   }
 
   // if there are more results for this artist, get them all and wait for them to return

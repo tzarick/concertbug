@@ -53,7 +53,7 @@ export class ConcertCollection {
   ): UniqueConcertLocation[] {
     const uniqueLocations: UniqueConcertLocation[] = [];
     for (let concert of elligibleConcerts) {
-      // have already added this location
+      // have we already added this location
       const existingIndex = uniqueLocations.findIndex(
         (item) =>
           item.location.lat() === concert.venue.location.lat() &&
