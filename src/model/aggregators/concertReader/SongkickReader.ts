@@ -23,7 +23,8 @@ export class SongkickReader extends ConcertDataReader {
     });
 
     const responses: AxiosResponse[] = await Promise.all(concertDataPromises);
-    // console.log(responses);
+
+    console.log(responses);
     // const allResponses = responses.map(
     //   async (response, i) =>
     //     await this.getAllPages(response.data, artists[i].name)
@@ -49,6 +50,7 @@ export class SongkickReader extends ConcertDataReader {
     const concertInfo = allResponses.filter(
       (item) => item.concertInfo.length > 0
     );
+
     // console.log(concertInfo);
     // const allResponsesClean =
     //   .map((item) => item.resultsPage.results)
@@ -109,11 +111,30 @@ export class SongkickReader extends ConcertDataReader {
             .filter((item) => item !== artistName)
         : [];
 
+    let datetime = null;
+    if (event.start.date) {
+      datetime = new Date(event.start.date.replace(/-/g, '/')); // format with slash instead of dash - workaround to get correct date using Date()
+      if (event.start.time) {
+        // manually add time - workaround to get correct date using Date()
+        const time = event.start.time;
+        const hour = parseInt(event.start.time.slice(0, time.indexOf(':')));
+        const min = parseInt(
+          event.start.time.slice(time.indexOf(':') + 1, time.lastIndexOf(':'))
+        );
+        const sec = parseInt(
+          event.start.time.slice(time.lastIndexOf(':') + 1, time.length)
+        );
+        datetime.setHours(hour);
+        datetime.setMinutes(min);
+        datetime.setSeconds(sec);
+      }
+    }
+
     return {
       title: event.displayName,
       uri: event.uri,
       type: event.type,
-      date: new Date(event.start.datetime),
+      date: datetime ? datetime : null,
       venue: {
         name:
           event.venue && event.venue.displayName

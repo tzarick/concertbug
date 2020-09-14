@@ -35,17 +35,19 @@ export class ConcertCollection {
     startDate: Date,
     endDate: Date
   ): UniqueConcertLocation[] {
-    const elligibleConcerts = this.concerts.filter(
-      (concert) =>
+    const elligibleConcerts = this.concerts.filter((concert) => {
+      return (
+        concert.date && // don't display concert if we don't know when it is -> maybe change this later?
         concert.distanceAway < maxDistance &&
         concert.date > startDate &&
         concert.date < endDate
-    );
+      );
+    });
 
     return this.getUniqueConcertLocations(elligibleConcerts);
   }
 
-  // put all concerts that are at the same location into the same marker so we can see them all still (stack info contents later)
+  // put all concerts that are at the same location into the same marker so we can view each one still (stack info contents later)
   private getUniqueConcertLocations(
     elligibleConcerts: Concert[]
   ): UniqueConcertLocation[] {
@@ -116,6 +118,7 @@ export class ConcertCollection {
         lat: concert.venue.lat,
         lng: concert.venue.lng,
       }),
+      bill: concert.bill,
     }));
   }
 }

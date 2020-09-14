@@ -9,7 +9,7 @@ export interface ConcertInfo {
   title: string;
   uri: string;
   type: string; // Concert or Festival
-  date: Date;
+  date: Date | null;
   venue: {
     name: string;
     lat: number;

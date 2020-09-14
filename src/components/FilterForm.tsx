@@ -34,6 +34,11 @@ const FormDrawer: React.FC<DrawerProps> = ({
         endDate: new Date('2100-01-01'),
       }}
       onSubmit={(values) => {
+        // set date values so they capture all concerts on those days and in between them
+        values.startDate.setHours(0);
+        values.startDate.setMinutes(0);
+        values.endDate.setHours(23);
+        values.endDate.setMinutes(59);
         onSubmit(values);
       }}
     >
