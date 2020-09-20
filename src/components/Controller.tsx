@@ -7,8 +7,13 @@ import {
   artistInfo,
 } from '../model/aggregators/libraryReader/MusicLibraryReader';
 import { ArtistCollection } from '../model/artists/ArtistCollection';
-import { ConcertCollection } from '../model/concerts/ConcertCollection';
+import {
+  ConcertCollection,
+  UniqueConcertLocation,
+} from '../model/concerts/ConcertCollection';
 import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
+import { Artist } from '../model/artists/Artist';
+import { Concert } from '../model/concerts/Concert';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -27,6 +32,9 @@ interface State {
   userConstraints: UserConstraints;
   filterDrawerOpen: boolean;
   libraryReader: MusicLibraryReader | null;
+  concertCollection: ConcertCollection | null;
+  artistCollection: ArtistCollection | null;
+  // artists: Artist[];
 }
 
 export class Controller extends React.Component<Props, State> {
@@ -34,36 +42,11 @@ export class Controller extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    // this is necessary because of the uri redirect after auth - our state gets wiped
-    const streamingService = MusicLibraryReader.getStreamingService();
-    var libraryReader = null;
-    if (streamingService === StreamingService.Spotify) {
-      libraryReader = new SpotifyReader();
-      // libraryReader
-      //   .fetchArtists()
-      //   .then((response: artistInfo[]) => console.log(response));
-
-      // libraryReader.fetchArtists();
-      const artistsCollection = new ArtistCollection(libraryReader);
-      // artistsCollection.fillArtists().then((response) => {
-      //   console.log(artistsCollection.artists);
-      // });
-      artistsCollection.fillArtists().then((response) => {
-        console.log(response);
-        const concertReader = new SongkickReader();
-        const concertCollection = new ConcertCollection(concertReader);
-        concertCollection.fetchConcerts(response).then((response) => {
-          console.log(response);
-        });
-      });
-    } else if (streamingService === StreamingService.AppleMusic) {
-      // todo
-    } else {
-      console.log('Not logged in');
-    }
 
     this.state = {
-      libraryReader: libraryReader,
+      artistCollection: null,
+      libraryReader: null,
+      concertCollection: null,
       filterDrawerOpen: false,
       userConstraints: {
         distanceRadius: 2000,
@@ -73,7 +56,52 @@ export class Controller extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    // this is necessary because of the uri redirect after auth - our state gets wiped
+    const streamingService = MusicLibraryReader.getStreamingService();
+    // var libraryReader = null;
+    // var artistsCollection = null;
+    if (streamingService === StreamingService.Spotify) {
+      const libraryReader = new SpotifyReader();
+      // this.state = { ...this.state, libraryReader: libraryReader };
+      this.setState({
+        ...this.state,
+        libraryReader: libraryReader,
+      });
+      // libraryReader
+      //   .fetchArtists()
+      //   .then((response: artistInfo[]) => console.log(response));
+
+      // libraryReader.fetchArtists();
+      const artistsCollection = new ArtistCollection(libraryReader);
+      // artistsCollection.fillArtists().then((response) => {
+      //   console.log(artistsCollection.artists);
+      // });
+      artistsCollection.fillArtists().then((artists) => {
+        this.setState({
+          ...this.state,
+          artistCollection: artistsCollection,
+        });
+        const concertCollection = new ConcertCollection(new SongkickReader());
+        concertCollection.fetchConcerts(artists).then((concerts) => {
+          this.setState({
+            ...this.state,
+            concertCollection: concertCollection,
+          });
+        });
+        // console.log(response);
+        // const concertReader = new SongkickReader();
+        // const concertCollection = new ConcertCollection(concertReader);
+        // concertCollection.fetchConcerts(response).then((response) => {
+        //   console.log(response);
+        // });
+      });
+    } else if (streamingService === StreamingService.AppleMusic) {
+      // todo
+    } else {
+      console.log('Not logged in');
+    }
+  }
 
   updateUserContstraints(newConstraints: UserConstraints) {
     this.setState({
@@ -89,6 +117,20 @@ export class Controller extends React.Component<Props, State> {
     });
   };
 
+  getConcertLocations = (): UniqueConcertLocation[] => {
+    let concertLocations: UniqueConcertLocation[] = [];
+    if (this.state.concertCollection) {
+      const { distanceRadius, startDate, endDate } = this.state.userConstraints;
+      concertLocations = this.state.concertCollection.getElligibleConcertLocations(
+        distanceRadius,
+        startDate,
+        endDate
+      );
+    }
+
+    return concertLocations;
+  };
+
   public render(): JSX.Element {
     return (
       <div className="controller">
@@ -99,7 +141,13 @@ export class Controller extends React.Component<Props, State> {
           }}
           onStreamingServiceSelect={this.onStreamingServiceSelect}
         />
-        <CustomMap libraryReader={this.state.libraryReader} divId="map" />
+        <CustomMap
+          // libraryReader={this.state.libraryReader}
+          divId="map"
+          // userConstraints={this.state.userConstraints}
+          // artists={this.state.artists}
+          getConcertLocations={this.getConcertLocations}
+        />
       </div>
     );
   }

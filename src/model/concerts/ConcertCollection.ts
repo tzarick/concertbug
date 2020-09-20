@@ -7,7 +7,7 @@ import {
 import { Artist } from '../artists/Artist';
 import { getDistance } from 'geolib';
 
-interface UniqueConcertLocation {
+export interface UniqueConcertLocation {
   location: google.maps.LatLng;
   concerts: Concert[];
 }
