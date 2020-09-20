@@ -63,9 +63,9 @@ export class Controller extends React.Component<Props, State> {
     // var artistsCollection = null;
     if (streamingService === StreamingService.Spotify) {
       const libraryReader = new SpotifyReader();
-      libraryReader.getPreviewUri('2JFljHPanIjYy2QqfNYvC0').then((uri) => {
-        console.log(uri);
-      });
+      // libraryReader.getPreviewUri('2JFljHPanIjYy2QqfNYvC0').then((uri) => {
+      //   console.log(uri);
+      // });
       // this.state = { ...this.state, libraryReader: libraryReader };
       this.setState({
         ...this.state,
@@ -147,6 +147,7 @@ export class Controller extends React.Component<Props, State> {
             this.updateUserContstraints(constraints);
           }}
           onStreamingServiceSelect={this.onStreamingServiceSelect}
+          userConstraints={this.state.userConstraints}
         />
         <CustomMap
           // libraryReader={this.state.libraryReader}

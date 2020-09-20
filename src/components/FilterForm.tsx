@@ -9,11 +9,13 @@ import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 interface FilterFormProps {
   onSubmit: (values: UserConstraints) => void;
   filterButtonClass: string;
+  userConstraints: UserConstraints;
 }
 
 interface DrawerProps {
   onSubmit: (values: UserConstraints) => void;
   updateDrawer: (open: boolean) => void;
+  userConstraints: UserConstraints;
 }
 
 interface FilterFormState {
@@ -23,22 +25,27 @@ interface FilterFormState {
 const FormDrawer: React.FC<DrawerProps> = ({
   onSubmit,
   updateDrawer,
+  userConstraints,
 }): JSX.Element => {
   const classes = gridStyles();
 
   return (
     <Formik
       initialValues={{
-        distanceRadius: 2000,
-        startDate: new Date(),
-        endDate: new Date('2100-01-01'),
+        distanceRadius: userConstraints.distanceRadius,
+        startDate: userConstraints.startDate,
+        endDate: userConstraints.endDate,
       }}
       onSubmit={(values) => {
         // set date values so they capture all concerts on those days and in between them
-        values.startDate.setHours(0);
-        values.startDate.setMinutes(0);
-        values.endDate.setHours(23);
-        values.endDate.setMinutes(59);
+        let start = new Date(values.startDate.toString().replace(/\-/g, '/'));
+        start.setHours(0, 0);
+        values.startDate = start;
+
+        let end = new Date(values.endDate.toString().replace(/\-/g, '/'));
+        end.setHours(23, 59);
+        values.endDate = end;
+
         onSubmit(values);
       }}
     >
@@ -160,6 +167,7 @@ export class FilterForm extends React.Component<
           <FormDrawer
             onSubmit={this.props.onSubmit}
             updateDrawer={this.updateDrawer}
+            userConstraints={this.props.userConstraints}
           />
         </Drawer>
       </div>

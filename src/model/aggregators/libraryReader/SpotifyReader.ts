@@ -39,7 +39,7 @@ export class SpotifyReader extends MusicLibraryReader {
 
   async fetchArtists(): Promise<artistInfo[]> {
     const savedTracksArtists = await this.fetchSavedTracksArtists();
-    const filledArtists = await this.addPreviewUris(savedTracksArtists);
+    // const filledArtists = await this.addPreviewUris(savedTracksArtists);
     return savedTracksArtists;
   }
 

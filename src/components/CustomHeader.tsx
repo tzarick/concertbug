@@ -10,11 +10,13 @@ import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibr
 interface Props {
   onFilterConstraintsSubmit: (constraints: UserConstraints) => void;
   onStreamingServiceSelect: (reader: MusicLibraryReader) => void;
+  userConstraints: UserConstraints;
 }
 
 export const CustomHeader: React.FC<Props> = ({
   onFilterConstraintsSubmit,
   onStreamingServiceSelect,
+  userConstraints,
 }) => {
   const classes = gridStyles();
 
@@ -45,6 +47,7 @@ export const CustomHeader: React.FC<Props> = ({
         <Grid className={classes.headerItem} item>
           <FilterForm
             filterButtonClass={classes.headerButton}
+            userConstraints={userConstraints}
             onSubmit={onFilterConstraintsSubmit}
           />
         </Grid>

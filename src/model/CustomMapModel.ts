@@ -2,6 +2,7 @@ import { mapStyles } from '../styles/mapStyles';
 import bugMarkerPath from '../styles/images/BugMarker64.png';
 import { UniqueConcertLocation } from './concerts/ConcertCollection';
 import { Concert } from './concerts/Concert';
+import { MusicLibraryReader } from './aggregators/libraryReader/MusicLibraryReader';
 
 // google map wrapper class
 export class CustomMapModel {
@@ -126,8 +127,10 @@ export class CustomMapModel {
             </a>
           </li>
         </ul>
-        <iframe src="spotify:artist:0LIll5i3kwo5A3IDpipgkS" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-      </div>
+        <iframe class="preview" id="${
+          concert.artist.streamingId
+        }" src="" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+        </div>
         `;
 
       content += concertDetails;
@@ -139,10 +142,15 @@ export class CustomMapModel {
 
     infoWindow.set('openStatus', false); // not open yet
 
-    marker.addListener('click', () => {
+    marker.addListener('click', async () => {
       const isOpen = infoWindow.get('openStatus');
 
       if (!isOpen) {
+        // let content = infoWindow.getContent();
+        // const newContent = await this.fillPreviewUris(content.toString());
+        // if (!content.toString().includes('iframe')) {
+        //   // add song preview iframe
+        // }
         infoWindow.open(this.googleMap, marker);
         infoWindow.set('openStatus', true);
       } else {
@@ -158,6 +166,31 @@ export class CustomMapModel {
     }
     this.markers = [];
   }
+
+  // private async fillPreviewUris(content: string): Promise<string> {
+  //   const html = document.createElement('div');
+  //   html.innerHTML = content;
+  //   const iframes = html.getElementsByClassName('preview');
+  //   console.log(iframes.item(0)?.getAttribute('id'));
+  //   let i = 0;
+  //   let item = iframes.item(i);
+  //   while (item && i < 15) {
+  //     const uri = await this.getUri(item.getAttribute('id'));
+  //     if (uri) item.setAttribute('src', uri);
+
+  //     i++;
+  //     item = iframes.item(i);
+  //   }
+  //   return '';
+  // }
+
+  // private async getUri(artistId: string | null): Promise<string | null> {
+  //   let uri: string | null = '';
+  //   if (artistId) {
+  //     uri = await this.libraryReader.getPreviewUri(artistId);
+  //   }
+  //   return uri || '';
+  // }
 
   private handleNewCoords(latLng: google.maps.LatLng): void {
     console.log(`lat: ${latLng.lat()}`);
