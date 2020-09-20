@@ -117,14 +117,18 @@ export class Controller extends React.Component<Props, State> {
     });
   };
 
-  getConcertLocations = (): UniqueConcertLocation[] => {
+  getConcertLocations = (
+    centerPoint: google.maps.LatLng
+  ): UniqueConcertLocation[] => {
     let concertLocations: UniqueConcertLocation[] = [];
     if (this.state.concertCollection) {
       const { distanceRadius, startDate, endDate } = this.state.userConstraints;
+      console.log(distanceRadius);
       concertLocations = this.state.concertCollection.getElligibleConcertLocations(
         distanceRadius,
         startDate,
-        endDate
+        endDate,
+        centerPoint
       );
     }
 

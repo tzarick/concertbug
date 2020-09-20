@@ -12,6 +12,12 @@ export interface UniqueConcertLocation {
   concerts: Concert[];
 }
 
+const UnknownVenueCoords = {
+  // atlantic ocean
+  lat: 36.2392423,
+  lng: -72.4949963,
+};
+
 export class ConcertCollection {
   private concerts: Concert[] = [];
   constructor(private concertReader: ConcertDataReader) {}
@@ -21,8 +27,8 @@ export class ConcertCollection {
     concertInfo.forEach((concert) => {
       this.concerts.push(
         ...this.buildConcertsForArtist(
-          concert,
-          new google.maps.LatLng(39.9612, -82.9988) // TODO change this to dynamic center point
+          concert
+          // new google.maps.LatLng(39.9612, -82.9988) // TODO change this to dynamic center point
         )
       );
     });
@@ -33,14 +39,20 @@ export class ConcertCollection {
   getElligibleConcertLocations(
     maxDistance: number,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    centerPoint: google.maps.LatLng
   ): UniqueConcertLocation[] {
     const elligibleConcerts = this.concerts.filter((concert) => {
+      const isUnknownVenue =
+        concert.venue.location.lat() === UnknownVenueCoords.lat &&
+        concert.venue.location.lng() === UnknownVenueCoords.lng;
       return (
-        concert.date && // don't display concert if we don't know when it is -> maybe change this later?
-        concert.distanceAway < maxDistance &&
-        concert.date > startDate &&
-        concert.date < endDate
+        isUnknownVenue ||
+        (concert.date && // don't display concert if we don't know when it is -> maybe change this later?
+          this.distanceAway(centerPoint, concert.venue.location) <
+            maxDistance &&
+          concert.date > startDate &&
+          concert.date < endDate)
       );
     });
 
@@ -74,34 +86,38 @@ export class ConcertCollection {
 
   private distanceAway(
     center: google.maps.LatLng,
-    concert: { lat: number; lng: number }
+    concert: google.maps.LatLng
   ): number {
-    if (concert.lat === -1) {
+    if (concert.lat() === -1) {
       // unknown venue location --> will be added to a special "unknown" marker in the atlantic ocean
       return 0;
     }
 
     let distance = 100000000000; // don't display if getDistance fails
     try {
-      distance = getDistance(concert, {
-        lat: center.lat(),
-        lng: center.lng(),
-      });
+      distance = getDistance(
+        {
+          lat: concert.lat(),
+          lng: concert.lng(),
+        },
+        {
+          lat: center.lat(),
+          lng: center.lng(),
+        }
+      );
     } catch {
       console.log('getDistance between 2 points failed');
     }
 
-    const metersInAMile = 1609.34;
-    return distance / metersInAMile;
+    const METERS_IN_MILE = 1609.34;
+    return distance / METERS_IN_MILE;
   }
 
-  private buildConcertsForArtist(
-    concertInfo: RawConcertObj,
-    center: google.maps.LatLng
-  ): Concert[] {
+  private buildConcertsForArtist(concertInfo: RawConcertObj): Concert[] {
     const artistName = concertInfo.concertArtistInfo.name;
 
     return concertInfo.concertInfo.map((concert) => ({
+      displayName: concert.title,
       artist: artistName,
       date: concert.date,
       ticketLink: concert.uri,
@@ -112,12 +128,15 @@ export class ConcertCollection {
         location:
           concert.venue.lat > 0
             ? new google.maps.LatLng(concert.venue.lat, concert.venue.lng)
-            : new google.maps.LatLng(36.2392423, -72.4949963), // atlantic ocean
+            : new google.maps.LatLng(
+                UnknownVenueCoords.lat,
+                UnknownVenueCoords.lng
+              ), // atlantic ocean
       },
-      distanceAway: this.distanceAway(center, {
-        lat: concert.venue.lat,
-        lng: concert.venue.lng,
-      }),
+      // distanceAway: this.distanceAway(center, {
+      //   lat: concert.venue.lat,
+      //   lng: concert.venue.lng,
+      // }),
       bill: concert.bill,
     }));
   }

@@ -1,5 +1,7 @@
 import { mapStyles } from '../styles/mapStyles';
 import bugMarkerPath from '../styles/images/BugMarker64.png';
+import { UniqueConcertLocation } from './concerts/ConcertCollection';
+import { Concert } from './concerts/Concert';
 
 // google map wrapper class
 export class CustomMapModel {
@@ -39,7 +41,7 @@ export class CustomMapModel {
     );
   }
 
-  placeMarker(coords: google.maps.LatLng): void {
+  placeMarker(coords: google.maps.LatLng, concerts: Concert[]): void {
     var marker = new google.maps.Marker({
       position: coords,
       map: this.googleMap,
@@ -47,7 +49,7 @@ export class CustomMapModel {
       animation: google.maps.Animation.BOUNCE,
     });
 
-    this.attachInfoWindow(marker);
+    this.attachInfoWindow(marker, concerts);
 
     setTimeout(() => {
       marker.setAnimation(null);
@@ -56,13 +58,45 @@ export class CustomMapModel {
     this.markers.push(marker);
   }
 
-  private attachInfoWindow(marker: google.maps.Marker): void {
-    const content = `
-      <div>
-        <h3>Mouthwatering Concert #1</h3>
-        <p>details etc...</p>
+  placeMarkers(uniqueConcertLocations: UniqueConcertLocation[]) {
+    for (let location of uniqueConcertLocations) {
+      this.placeMarker(location.location, location.concerts);
+    }
+  }
+
+  private attachInfoWindow(
+    marker: google.maps.Marker,
+    concerts: Concert[]
+  ): void {
+    // const content = `
+    //   <div>
+    //     <h3>Mouthwatering Concert #1</h3>
+    //     <p>details etc...</p>
+    //   </div>
+    // `;
+
+    let content = '';
+    for (let concert of concerts) {
+      const concertDetails = `
+      <div style="background-color: #ffebee">
+        <h3>${concert.displayName}</h3>
+        <h4>${concert.artist}</h5>
+        <ul>
+          <li><strong>Date:</strong> xx-xx-xxxx</li>
+          <li><strong>Time:</strong> xx:xx</li>
+          <li><strong>Venue:</strong> ${concert.venue.name}</li>
+          <li><strong>Other Artists On Bill:</strong> ${concert.bill}</li>
+          <li><a target="_blank" href=${concert.ticketLink}><strong>Tickets + More Info</strong></a></li>
+        </ul>
+
       </div>
-    `;
+        `;
+      //   <li>Date: ${concert.date ? concert.date.getMonth() + 1 : '00'}-${
+      //   concert.date ? concert.date?.getDay() + 1 : '00'
+      // }-${concert.date?.getFullYear()}</p>
+
+      content += concertDetails;
+    }
 
     const infoWindow = new google.maps.InfoWindow({
       content: content,

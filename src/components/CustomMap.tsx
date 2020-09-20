@@ -21,7 +21,9 @@ interface Props {
   // libraryReader: MusicLibraryReader | null;
   // userConstraints: UserConstraints;
   // artists: Artist[];
-  getConcertLocations: () => UniqueConcertLocation[];
+  getConcertLocations: (
+    centerPoint: google.maps.LatLng
+  ) => UniqueConcertLocation[];
   // onMapLoad: (map: google.maps.Map) => void;
   // apiKey: string;
 }
@@ -30,6 +32,12 @@ interface State {
   mapCenter: google.maps.LatLng;
 }
 
+const DefaultStartCoords = {
+  // Columbus
+  lat: 39.9612,
+  lng: -82.9988,
+};
+
 export class CustomMap extends React.Component<Props, State> {
   map: CustomMapModel | null = null; // add value once component mounts
 
@@ -37,9 +45,9 @@ export class CustomMap extends React.Component<Props, State> {
     super(props);
 
     const center: google.maps.LatLng = new google.maps.LatLng(
-      39.9612,
-      -82.9988
-    ); // Columbus
+      DefaultStartCoords.lat,
+      DefaultStartCoords.lng
+    );
     this.state = { mapCenter: center };
   }
 
@@ -56,9 +64,16 @@ export class CustomMap extends React.Component<Props, State> {
     this.setState({ mapCenter: center });
   };
 
+  private centerHasBeenSet(): boolean {
+    return (
+      this.state.mapCenter.lat() !== DefaultStartCoords.lat &&
+      this.state.mapCenter.lng() !== DefaultStartCoords.lng
+    );
+  }
+
   render(): JSX.Element {
     // if (this.map && this.props.libraryReader && this.props.artists.length > 0) {
-    if (this.map) {
+    if (this.map && this.centerHasBeenSet()) {
       this.map.clearMarkers();
       // Artists and Concerts are both stored in controller's state - filled here *usually*
       // this.map.setCenter(this.state.mapCenter); // instead of re-centering here we would get the new list of concerts / generate new markers based on the changed inputs
@@ -67,10 +82,13 @@ export class CustomMap extends React.Component<Props, State> {
       // concertCollection.fetchConcerts(this.props.artists).then((concerts) => {
       //   console.log(concerts);
       // });
-      const uniqueLocations = this.props.getConcertLocations();
-      console.log(uniqueLocations);
+      const uniqueLocations = this.props.getConcertLocations(
+        this.state.mapCenter
+      );
 
-      this.map.placeMarker(this.state.mapCenter);
+      console.log(uniqueLocations);
+      this.map.placeMarkers(uniqueLocations);
+      // this.map.placeMarker(this.state.mapCenter);
     }
 
     console.log('renderoo');

@@ -7,6 +7,7 @@ type ConcertArtist = {
 
 // export class Concert {}
 export interface Concert {
+  displayName: string;
   artist: string;
   date: Date | null;
   ticketLink: string;
@@ -16,6 +17,5 @@ export interface Concert {
     name: string;
     location: google.maps.LatLng;
   };
-  distanceAway: number;
   bill: string[];
 }
