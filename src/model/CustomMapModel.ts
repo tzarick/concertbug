@@ -142,15 +142,20 @@ export class CustomMapModel {
 
     infoWindow.set('openStatus', false); // not open yet
 
-    marker.addListener('click', async () => {
+    marker.addListener('click', () => {
       const isOpen = infoWindow.get('openStatus');
 
       if (!isOpen) {
-        // let content = infoWindow.getContent();
-        // const newContent = await this.fillPreviewUris(content.toString());
-        // if (!content.toString().includes('iframe')) {
-        //   // add song preview iframe
-        // }
+        if (!content.toString().includes('spotify:track')) {
+          // add song preview iframe
+          // open window -> load uri preview from spotify -> put it into the window once it arrives. So we don't freeze everything up while waiting
+          let content = infoWindow.getContent();
+          const newContent = this.getPreviewUris(content.toString()).then(
+            (response) => {
+              infoWindow.setContent(response);
+            }
+          );
+        }
         infoWindow.open(this.googleMap, marker);
         infoWindow.set('openStatus', true);
       } else {
@@ -167,30 +172,30 @@ export class CustomMapModel {
     this.markers = [];
   }
 
-  // private async fillPreviewUris(content: string): Promise<string> {
-  //   const html = document.createElement('div');
-  //   html.innerHTML = content;
-  //   const iframes = html.getElementsByClassName('preview');
-  //   console.log(iframes.item(0)?.getAttribute('id'));
-  //   let i = 0;
-  //   let item = iframes.item(i);
-  //   while (item && i < 15) {
-  //     const uri = await this.getUri(item.getAttribute('id'));
-  //     if (uri) item.setAttribute('src', uri);
+  private async getPreviewUris(content: string): Promise<string> {
+    const html = document.createElement('div');
+    html.innerHTML = content;
+    const iframes = html.getElementsByClassName('preview');
+    console.log(iframes.item(0)?.getAttribute('id'));
+    let i = 0;
+    let item = iframes.item(i);
+    while (item && i < 15) {
+      const uri = await this.getUri(item.getAttribute('id'));
+      if (uri) item.setAttribute('src', uri);
 
-  //     i++;
-  //     item = iframes.item(i);
-  //   }
-  //   return '';
-  // }
+      i++;
+      item = iframes.item(i);
+    }
+    return '';
+  }
 
-  // private async getUri(artistId: string | null): Promise<string | null> {
-  //   let uri: string | null = '';
-  //   if (artistId) {
-  //     uri = await this.libraryReader.getPreviewUri(artistId);
-  //   }
-  //   return uri || '';
-  // }
+  private async getUri(artistId: string | null): Promise<string | null> {
+    let uri: string | null = '';
+    if (artistId) {
+      // uri = await this.libraryReader.getPreviewUri(artistId);
+    }
+    return uri || '';
+  }
 
   private handleNewCoords(latLng: google.maps.LatLng): void {
     console.log(`lat: ${latLng.lat()}`);
