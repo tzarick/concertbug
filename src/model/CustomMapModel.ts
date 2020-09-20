@@ -64,36 +64,71 @@ export class CustomMapModel {
     }
   }
 
+  private getDateFormatted(date: Date | null): string {
+    let displayDate = '?';
+    if (date) {
+      displayDate = date.toString().slice(0, 15);
+    }
+
+    return displayDate;
+  }
+
+  private getTimeFormatted(date: Date | null): string {
+    let displayTime = '?';
+    if (date) {
+      const time = date.toTimeString().slice(0, 5);
+      if (time !== '00:00') {
+        displayTime = time;
+      }
+    }
+
+    return displayTime;
+  }
+
+  private getBillFormatted(bill: string[]): string {
+    let displayBill = '';
+    if (bill && bill.length > 0) {
+      displayBill = '<ul>';
+      bill.forEach((artist) => {
+        displayBill += `<li>${artist}</li>`;
+      });
+      displayBill += '</ul>';
+    }
+
+    return displayBill;
+  }
+
   private attachInfoWindow(
     marker: google.maps.Marker,
     concerts: Concert[]
   ): void {
-    // const content = `
-    //   <div>
-    //     <h3>Mouthwatering Concert #1</h3>
-    //     <p>details etc...</p>
-    //   </div>
-    // `;
-
     let content = '';
     for (let concert of concerts) {
       const concertDetails = `
-      <div style="background-color: #ffebee">
-        <h3>${concert.displayName}</h3>
-        <h4>${concert.artist}</h5>
+      <div style="background-color: #ffebee; padding: 5px; border-bottom: 3px solid #D4DBDD;">
+        <h2>${concert.artist.name}</h2>
+        <h4>${concert.displayName}</h4>
         <ul>
-          <li><strong>Date:</strong> xx-xx-xxxx</li>
-          <li><strong>Time:</strong> xx:xx</li>
-          <li><strong>Venue:</strong> ${concert.venue.name}</li>
-          <li><strong>Other Artists On Bill:</strong> ${concert.bill}</li>
-          <li><a target="_blank" href=${concert.ticketLink}><strong>Tickets + More Info</strong></a></li>
-        </ul>
+          <li><strong>When:</strong> ${this.getDateFormatted(
+            concert.date
+          )}, ${this.getTimeFormatted(concert.date)}</li>
 
+          <li><strong>Where:</strong> ${concert.venue.name}</li>
+          <li> 
+            <details>
+              <summary><strong>Other Artists On Bill:</strong></summary>
+                <div>${this.getBillFormatted(concert.bill)}</div>
+              </details>
+          </li>
+          <li>
+            <a target="_blank" href=${concert.ticketLink}>
+              <strong>Tickets + More Info</strong>
+            </a>
+          </li>
+        </ul>
+        <iframe src="spotify:artist:0LIll5i3kwo5A3IDpipgkS" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
       </div>
         `;
-      //   <li>Date: ${concert.date ? concert.date.getMonth() + 1 : '00'}-${
-      //   concert.date ? concert.date?.getDay() + 1 : '00'
-      // }-${concert.date?.getFullYear()}</p>
 
       content += concertDetails;
     }

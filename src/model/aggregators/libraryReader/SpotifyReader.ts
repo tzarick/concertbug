@@ -1,20 +1,10 @@
 import { MusicLibraryReader, artistInfo } from './MusicLibraryReader';
 import { hashParamsExist, getHashParams } from '../../utils';
 import axios, { AxiosResponse } from 'axios';
+import { SpotifyTopTracksObject, SpotifyTrackObject } from './spotifyTypes';
 import lodash from 'lodash';
 
 const _ = lodash;
-
-interface spotifyTrackObject {
-  track: {
-    artists: [
-      {
-        name: string;
-        id: string;
-      }
-    ];
-  };
-}
 
 const savedTracksEndpoint = 'https://api.spotify.com/v1/me/tracks?limit=50';
 
@@ -49,25 +39,50 @@ export class SpotifyReader extends MusicLibraryReader {
 
   async fetchArtists(): Promise<artistInfo[]> {
     const savedTracksArtists = await this.fetchSavedTracksArtists();
+    const filledArtists = await this.addPreviewUris(savedTracksArtists);
     return savedTracksArtists;
   }
 
   async getPreviewUri(artistId: string): Promise<string | null> {
     const topTracksEnpoint = `https://api.spotify.com/v1/artists/${artistId}/top-tracks?country=US`;
     var uri: string | null = null;
-    await axios
-      .get(topTracksEnpoint, {
+    return await axios.get(topTracksEnpoint, {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+    // .then((response: AxiosResponse): void => {
+    //   uri = response.data.uri;
+    // });
+
+    return uri;
+  }
+
+  private async addPreviewUris(artists: artistInfo[]): Promise<artistInfo[]> {
+    const previewPromises = artists.map((artist) => {
+      const topTracksEnpoint = `https://api.spotify.com/v1/artists/${artist.id}/top-tracks?country=US`;
+
+      return axios.get(topTracksEnpoint, {
         headers: {
           Authorization: `Bearer ${this.token}`,
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-      })
-      .then((response: AxiosResponse): void => {
-        uri = response.data.uri;
       });
+    });
 
-    return uri;
+    const previewUriResponses: AxiosResponse[] = await Promise.all(
+      previewPromises
+    );
+
+    for (let i = 0; i < artists.length; i++) {
+      const response: SpotifyTopTracksObject = previewUriResponses[i].data;
+      artists[i].previewUri = response.tracks[0].uri;
+    }
+
+    return artists;
   }
 
   private getToken(): void {
@@ -91,7 +106,7 @@ export class SpotifyReader extends MusicLibraryReader {
   //       next = response.data.next;
 
   //       const artists: artistInfo[] = response.data.items
-  //         .map((item: spotifyTrackObject) =>
+  //         .map((item: SpotifyTrackObject) =>
   //           item.track.artists.map(
   //             (artist): artistInfo => {
   //               return { name: artist.name, id: artist.id };
@@ -171,10 +186,10 @@ export class SpotifyReader extends MusicLibraryReader {
 
   private getArtistsFromTracksBatch(tracksBatch: AxiosResponse) {
     const artists: artistInfo[] = tracksBatch.data.items.map(
-      (item: spotifyTrackObject) =>
+      (item: SpotifyTrackObject) =>
         item.track.artists.map(
           (artist): artistInfo => {
-            return { name: artist.name, id: artist.id };
+            return { name: artist.name, id: artist.id, previewUri: null };
           }
         )
     ); // grab all artists on each track

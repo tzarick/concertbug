@@ -8,7 +8,10 @@ type ConcertArtist = {
 // export class Concert {}
 export interface Concert {
   displayName: string;
-  artist: string;
+  artist: {
+    name: string;
+    streamingId: string;
+  };
   date: Date | null;
   ticketLink: string;
   ticketsAvailable: boolean;

@@ -8,6 +8,7 @@ type UrlParam = {
 export interface artistInfo {
   name: string;
   id: string;
+  previewUri: string | null;
 }
 
 export abstract class MusicLibraryReader {

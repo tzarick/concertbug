@@ -20,14 +20,16 @@ export interface ConcertInfo {
 
 export interface ConcertArtist {
   name: string;
-  id: string; // id specific to concert service api
+  streamingServiceId: string; // id specific to streaming service api
+  concertServiceId: string; // id specific to concert service api
+  previewUri: string | null;
 }
 
 export abstract class ConcertDataReader {
   abstract async fetchConcertData(
     artistNames: Artist[]
   ): Promise<RawConcertObj[]>;
-  abstract async fetchArtistIDs(
-    artistNames: Artist[]
-  ): Promise<ConcertArtist[]>;
+  // abstract async fetchArtistIDs(
+  //   artistNames: Artist[]
+  // ): Promise<ConcertArtist[]>;
 }

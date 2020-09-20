@@ -115,14 +115,19 @@ export class ConcertCollection {
 
   private buildConcertsForArtist(concertInfo: RawConcertObj): Concert[] {
     const artistName = concertInfo.concertArtistInfo.name;
+    const artistId = concertInfo.concertArtistInfo.streamingServiceId;
+    const previewUri = concertInfo.concertArtistInfo.previewUri;
 
     return concertInfo.concertInfo.map((concert) => ({
       displayName: concert.title,
-      artist: artistName,
+      artist: {
+        name: artistName,
+        streamingId: artistId,
+      },
       date: concert.date,
       ticketLink: concert.uri,
       ticketsAvailable: true, // todo
-      songPreviewUri: null, // fill later
+      songPreviewUri: previewUri,
       venue: {
         name: concert.venue.name,
         location:

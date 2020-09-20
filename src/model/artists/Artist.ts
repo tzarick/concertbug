@@ -12,4 +12,5 @@
 export type Artist = {
   name: string;
   id: string;
+  previewUri: string | null;
 };
