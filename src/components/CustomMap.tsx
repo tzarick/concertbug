@@ -23,7 +23,7 @@ interface Props {
   // artists: Artist[];
   getConcertLocations: (
     centerPoint: google.maps.LatLng
-  ) => UniqueConcertLocation[];
+  ) => UniqueConcertLocation[] | null;
   // updateLoader: (loaderState: boolean) => void;
   // onMapLoad: (map: google.maps.Map) => void;
   // apiKey: string;
@@ -86,9 +86,13 @@ export class CustomMap extends React.Component<Props, State> {
       const uniqueLocations = this.props.getConcertLocations(
         this.state.mapCenter
       );
-
       console.log(uniqueLocations);
-      this.map.placeMarkers(uniqueLocations);
+      if (uniqueLocations === null) {
+        alert('Try selecting a streaming service first');
+      } else {
+        this.map.placeMarkers(uniqueLocations);
+      }
+
       // this.map.placeMarker(this.state.mapCenter);
     }
 

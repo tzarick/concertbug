@@ -52,7 +52,7 @@ export class Controller extends React.Component<Props, State> {
       filterDrawerOpen: false,
       loaderActive: false,
       userConstraints: {
-        distanceRadius: 2000,
+        distanceRadius: 300, // 300 mi default
         startDate: new Date(), // now, as default start
         endDate: new Date('2100-01-01'), // far in the future, as default end
       },
@@ -127,11 +127,11 @@ export class Controller extends React.Component<Props, State> {
 
   getConcertLocations = (
     centerPoint: google.maps.LatLng
-  ): UniqueConcertLocation[] => {
-    let concertLocations: UniqueConcertLocation[] = [];
+  ): UniqueConcertLocation[] | null => {
+    let concertLocations: UniqueConcertLocation[] | null = null;
     if (this.state.concertCollection) {
       const { distanceRadius, startDate, endDate } = this.state.userConstraints;
-      console.log(distanceRadius);
+
       concertLocations = this.state.concertCollection.getElligibleConcertLocations(
         distanceRadius,
         startDate,
