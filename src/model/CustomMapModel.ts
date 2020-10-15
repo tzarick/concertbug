@@ -2,7 +2,6 @@ import { mapStyles } from '../styles/mapStyles';
 import bugMarkerPath from '../styles/images/BugMarker64.png';
 import { UniqueConcertLocation } from './concerts/ConcertCollection';
 import { Concert } from './concerts/Concert';
-import { MusicLibraryReader } from './aggregators/libraryReader/MusicLibraryReader';
 
 // google map wrapper class
 export class CustomMapModel {

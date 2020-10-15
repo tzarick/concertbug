@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import LoadingOverlay from 'react-loading-overlay';
 import { CustomMap } from './CustomMap';
 import { CustomHeader } from './CustomHeader';
 import { SpotifyReader } from '../model/aggregators/libraryReader/SpotifyReader';
@@ -34,6 +35,7 @@ interface State {
   libraryReader: MusicLibraryReader | null;
   concertCollection: ConcertCollection | null;
   artistCollection: ArtistCollection | null;
+  loaderActive: boolean;
   // artists: Artist[];
 }
 
@@ -48,6 +50,7 @@ export class Controller extends React.Component<Props, State> {
       libraryReader: null,
       concertCollection: null,
       filterDrawerOpen: false,
+      loaderActive: false,
       userConstraints: {
         distanceRadius: 2000,
         startDate: new Date(), // now, as default start
@@ -80,6 +83,7 @@ export class Controller extends React.Component<Props, State> {
       // artistsCollection.fillArtists().then((response) => {
       //   console.log(artistsCollection.artists);
       // });
+      this.updateLoader(true);
       artistsCollection.fillArtists().then((artists) => {
         this.setState({
           ...this.state,
@@ -91,6 +95,7 @@ export class Controller extends React.Component<Props, State> {
             ...this.state,
             concertCollection: concertCollection,
           });
+          this.updateLoader(false);
         });
         // console.log(response);
         // const concertReader = new SongkickReader();
@@ -138,6 +143,14 @@ export class Controller extends React.Component<Props, State> {
     return concertLocations;
   };
 
+  updateLoader = (loaderState: boolean) => {
+    console.log('loader change: ' + loaderState);
+    this.setState({
+      ...this.state,
+      loaderActive: loaderState,
+    });
+  };
+
   public render(): JSX.Element {
     return (
       <div className="controller">
@@ -149,6 +162,24 @@ export class Controller extends React.Component<Props, State> {
           onStreamingServiceSelect={this.onStreamingServiceSelect}
           userConstraints={this.state.userConstraints}
         />
+        <LoadingOverlay
+          active={this.state.loaderActive}
+          spinner
+          styles={{
+            spinner: (base: any) => ({
+              ...base,
+              width: '100px',
+              '& svg circle': {
+                stroke: 'rgba(255, 0, 0, 0.5)',
+              },
+            }),
+            content: (base: any) => ({
+              ...base,
+              color: '#E31D1A',
+            }),
+          }}
+          text="Beep Boop Calculating..."
+        ></LoadingOverlay>
         <CustomMap
           // libraryReader={this.state.libraryReader}
           divId="map"

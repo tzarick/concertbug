@@ -24,6 +24,7 @@ interface Props {
   getConcertLocations: (
     centerPoint: google.maps.LatLng
   ) => UniqueConcertLocation[];
+  // updateLoader: (loaderState: boolean) => void;
   // onMapLoad: (map: google.maps.Map) => void;
   // apiKey: string;
 }
