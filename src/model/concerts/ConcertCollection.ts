@@ -6,17 +6,12 @@ import {
 } from '../aggregators/concertReader/ConcertDataReader';
 import { Artist } from '../artists/Artist';
 import { getDistance } from 'geolib';
+import { UnknownVenueCoords } from '../utils';
 
 export interface UniqueConcertLocation {
   location: google.maps.LatLng;
   concerts: Concert[];
 }
-
-const UnknownVenueCoords = {
-  // atlantic ocean
-  lat: 36.2392423,
-  lng: -72.4949963,
-};
 
 export class ConcertCollection {
   private concerts: Concert[] = [];
@@ -47,12 +42,11 @@ export class ConcertCollection {
         concert.venue.location.lat() === UnknownVenueCoords.lat &&
         concert.venue.location.lng() === UnknownVenueCoords.lng;
       return (
-        isUnknownVenue ||
-        (concert.date && // don't display concert if we don't know when it is -> maybe change this later?
-          this.distanceAway(centerPoint, concert.venue.location) <
-            maxDistance &&
-          concert.date > startDate &&
-          concert.date < endDate)
+        concert.date && // don't display concert if we don't know when it is -> maybe change this later?
+        (this.distanceAway(centerPoint, concert.venue.location) < maxDistance ||
+          isUnknownVenue) && // unknown locations will be put in a special spot
+        concert.date > startDate &&
+        concert.date < endDate
       );
     });
 

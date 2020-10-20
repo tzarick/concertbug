@@ -2,6 +2,7 @@ import { mapStyles } from '../styles/mapStyles';
 import bugMarkerPath from '../styles/images/BugMarker64.png';
 import { UniqueConcertLocation } from './concerts/ConcertCollection';
 import { Concert } from './concerts/Concert';
+import { UnknownVenueCoords } from './utils';
 
 // google map wrapper class
 export class CustomMapModel {
@@ -49,7 +50,7 @@ export class CustomMapModel {
       animation: google.maps.Animation.BOUNCE,
     });
 
-    this.attachInfoWindow(marker, concerts);
+    this.attachInfoWindow(marker, concerts, coords);
 
     setTimeout(() => {
       marker.setAnimation(null);
@@ -100,10 +101,36 @@ export class CustomMapModel {
 
   private attachInfoWindow(
     marker: google.maps.Marker,
-    concerts: Concert[]
+    concerts: Concert[],
+    location: google.maps.LatLng
   ): void {
     let content = '';
+    const isKnownVenue =
+      location.lat() !== UnknownVenueCoords.lat &&
+      location.lng() !== UnknownVenueCoords.lng;
+
+    const unknownLocationMarkerHeader = `
+      <div height="50" text-align="center">
+        <h3>&#128517; Concerts unable to precisely placed:</h3>
+      </div>
+    `;
+
+    if (!isKnownVenue) {
+      content = unknownLocationMarkerHeader;
+    }
+
     for (let concert of concerts) {
+      const uniqueIframe = `
+        <iframe 
+          class="preview" 
+          src="https://open.spotify.com/embed/artist/${concert.artist.streamingId}" 
+          width="300" 
+          height="80" 
+          frameborder="0" 
+          allowtransparency="true" 
+          allow="encrypted-media">
+        </iframe>`;
+
       const concertDetails = `
       <div style="background-color: #ffebee; padding: 5px; border-bottom: 3px solid #D4DBDD;">
         <h2>${concert.artist.name}</h2>
@@ -126,11 +153,7 @@ export class CustomMapModel {
             </a>
           </li>
         </ul>
-        <iframe class="preview" id="${
-          concert.artist.streamingId
-        }" src="https://open.spotify.com/embed/artist/${
-        concert.artist.streamingId
-      }" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+          ${isKnownVenue ? uniqueIframe : ''}
         </div>
         `;
 
@@ -139,6 +162,7 @@ export class CustomMapModel {
 
     const infoWindow = new google.maps.InfoWindow({
       content: content,
+      maxWidth: 350,
     });
 
     infoWindow.set('openStatus', false); // not open yet

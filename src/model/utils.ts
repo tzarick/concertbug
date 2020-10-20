@@ -10,3 +10,9 @@ export function getHashParams(): { [key: string]: string } {
 export function hashParamsExist(): boolean {
   return Object.keys(getHashParams())[0].length > 0;
 }
+
+export const UnknownVenueCoords = {
+  // atlantic ocean
+  lat: 36.2392423,
+  lng: -72.4949963,
+};

@@ -178,7 +178,7 @@ export class Controller extends React.Component<Props, State> {
               color: '#E31D1A',
             }),
           }}
-          text="Beep Boop Calculating..."
+          text="Beep Boop...Analyzing your music brain..."
         ></LoadingOverlay>
         <CustomMap
           // libraryReader={this.state.libraryReader}
