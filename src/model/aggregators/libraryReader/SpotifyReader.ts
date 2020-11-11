@@ -9,7 +9,7 @@ const _ = lodash;
 const savedTracksEndpoint = 'https://api.spotify.com/v1/me/tracks?limit=50';
 
 export class SpotifyReader extends MusicLibraryReader {
-  private redirectUri = 'http://localhost:3000/'; // TODO: change this to real prod URL
+  private redirectUri = process.env.REACT_APP_BASE_URL as string;
   private token = '';
   private artists: artistInfo[] = [];
   authorizeUrl = '';
