@@ -15,7 +15,8 @@
     "noEmit": true,
     "jsx": "react",
     "types": ["googlemaps"],
-    "strict": true
+    "strict": true,
+    "typeRoots": ["src/customTypings", "node_modules/@types"]
   },
   "include": ["src"]
 }
