@@ -3,6 +3,7 @@ import { ServiceSelectionMenu } from './ServiceSelectionMenu';
 import { UserConstraints } from './Controller';
 import { Grid } from '@material-ui/core';
 import BugBannerPath from '../styles/images/CBLogo.png';
+import GitHubLogoPath from '../styles/images/GHLogo.png';
 import { FilterForm } from './FilterForm';
 import { gridStyles } from '../styles/gridStyles';
 import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
@@ -52,6 +53,14 @@ export const CustomHeader: React.FC<Props> = ({
           />
         </Grid>
       </Grid>
+      <a href="https://github.com/tzarick/concertbug" target="_blank">
+        <img
+          className={classes.headerItem}
+          src={GitHubLogoPath}
+          alt="GitHub"
+          height="45"
+        />
+      </a>
     </div>
   );
 };

@@ -5,12 +5,11 @@
 - [Planning/Approach Overview](https://docs.google.com/document/d/1LQvc6JSZblEMstAgsUkg_fFnjt5LMhc5YHWmB8zfad0/edit?usp=sharing)
 - [(Initial) Class Diagram](https://github.com/tzarick/concertbug/blob/master/design/concertbug-v2-class-diagram1.jpg)
 
-## What Does It Give You?
+## What Does It Provide?
 
-- Geographical representation of all your liked artists' shows
-  - Filterable on:
-    1. Distance radius
-    2. Date range
+- A geographical representation of all your liked artists' shows. Filterable on:
+  1. Distance radius
+  2. Date range
 - Information about each show:
   - Date/time
   - Venue
