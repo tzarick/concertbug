@@ -1,6 +1,6 @@
 # Concertbug :microphone::beetle:
 
-ConcertBug is a live music search assistant tool - it looks through your music library, finds live shows in your vicinity that feature an artist you like, and displays them geographically on a map.
+[ConcertBug](https://concertbug.herokuapp.com) is a live music search assistant tool - it looks through your music library, finds live shows in your vicinity that feature an artist you like, and displays them geographically on a map.
 
 - [Planning/Approach Overview](https://docs.google.com/document/d/1LQvc6JSZblEMstAgsUkg_fFnjt5LMhc5YHWmB8zfad0/edit?usp=sharing)
 - [(Initial) Class Diagram](https://github.com/tzarick/concertbug/blob/master/design/concertbug-v2-class-diagram1.jpg)
