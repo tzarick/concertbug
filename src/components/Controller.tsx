@@ -1,20 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
 import LoadingOverlay from 'react-loading-overlay';
 import { CustomMap } from './CustomMap';
 import { CustomHeader } from './CustomHeader';
 import { SpotifyReader } from '../model/aggregators/libraryReader/SpotifyReader';
-import {
-  MusicLibraryReader,
-  artistInfo,
-} from '../model/aggregators/libraryReader/MusicLibraryReader';
+import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
 import { ArtistCollection } from '../model/artists/ArtistCollection';
 import {
   ConcertCollection,
   UniqueConcertLocation,
 } from '../model/concerts/ConcertCollection';
 import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
-import { Artist } from '../model/artists/Artist';
-import { Concert } from '../model/concerts/Concert';
 
 export interface UserConstraints {
   distanceRadius: number; // miles

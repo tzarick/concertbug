@@ -1,17 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import '../styles/CustomMap.css';
 import { CustomMapModel } from '../model/CustomMapModel';
-import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibraryReader';
-import { UserConstraints } from './Controller';
-import { ArtistCollection } from '../model/artists/ArtistCollection';
-import {
-  ConcertCollection,
-  UniqueConcertLocation,
-} from '../model/concerts/ConcertCollection';
-import { ConcertDataReader } from '../model/aggregators/concertReader/ConcertDataReader';
-import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
-import { Artist } from '../model/artists/Artist';
-import { AxiosResponse } from 'axios';
+import { UniqueConcertLocation } from '../model/concerts/ConcertCollection';
 
 // import { Map, GoogleApiWrapper, GoogleAPI } from 'google-maps-react';
 // import { CustomMapModel } from '../model/CustomMapModel';

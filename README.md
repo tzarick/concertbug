@@ -1,49 +1,49 @@
 # Concertbug :microphone::beetle:
 
-- [Overview](https://docs.google.com/document/d/1LQvc6JSZblEMstAgsUkg_fFnjt5LMhc5YHWmB8zfad0/edit?usp=sharing)
-- [Class Diagram](https://drive.google.com/file/d/1nfRYIGx9ARoaZmFSjmt5Q28UsofrOQZ8/view?usp=sharing)
+ConcertBug is a live music search assistant tool - it looks through your music library, finds live shows in your vicinity that feature an artist you like, and displays them geographically on a map.
+
+- [Planning/Approach Overview](https://docs.google.com/document/d/1LQvc6JSZblEMstAgsUkg_fFnjt5LMhc5YHWmB8zfad0/edit?usp=sharing)
+- [Class Diagram](https://github.com/tzarick/concertbug/blob/master/design/concertbug-v2-class-diagram1.jpg)
+
+## What Does It Give You?
+
+- Geographical representation of all your liked artists' shows
+  - Filterable on:
+    1. Distance radius
+    2. Date range
+- Information about each show:
+  - Date/time
+  - Venue
+  - Ticket info
+  - Embedded playable track from the selected artist
+- Bonus Feature(s) :cowboy_hat_face:
+
+## Details
+
+_Tech Stack:_
+
+- TypeScript
+- React.js
+- VSCode
+- Heroku
+
+_Resources:_
+
+- Spotify Web API
+- SongKick API
+- Google Maps Web API
+- (Apple Music API in the future hopefully)
+
+_Essential Packages:_
+
+- [axios](https://github.com/axios/axios)
+- [materialUI](https://material-ui.com/)
+- [geolib](https://github.com/manuelbieh/geolib)
+
+---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+### Note...
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+This project is most certainly not a purist React one. I'm sure React functionality could have been leveraged better. However, my main learning goal through this project was to exercise my TypeScript chops, specifially relating to OO design, so I tried to isolate as much of the logic into pure TypeScript modules as I could. This brought about it's own challenges but I liked the idea of keeping the model a little further removed from the framework (I also need to improve my deeper React understanding! More on that soon...).

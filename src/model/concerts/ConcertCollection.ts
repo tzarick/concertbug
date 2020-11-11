@@ -1,4 +1,3 @@
-import { ArtistCollection } from '../artists/ArtistCollection';
 import { Concert } from './Concert';
 import {
   ConcertDataReader,

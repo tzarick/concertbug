@@ -1,6 +1,6 @@
 import React from 'react';
 import { ServiceSelectionMenu } from './ServiceSelectionMenu';
-import { UserConstraints, StreamingService } from './Controller';
+import { UserConstraints } from './Controller';
 import { Grid } from '@material-ui/core';
 import BugBannerPath from '../styles/images/CBLogo.png';
 import { FilterForm } from './FilterForm';

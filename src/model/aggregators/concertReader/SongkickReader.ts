@@ -1,10 +1,9 @@
 import {
   ConcertDataReader,
   RawConcertObj,
-  ConcertArtist,
   ConcertInfo,
 } from './ConcertDataReader';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Artist } from '../../artists/Artist';
 import { SongKickResponse, SongKickEvent } from './songKickTypes';
 import lodash from 'lodash';
