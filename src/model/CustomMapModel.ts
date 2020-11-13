@@ -111,7 +111,7 @@ export class CustomMapModel {
 
     const unknownLocationMarkerHeader = `
       <div height="50" text-align="center">
-        <h3>&#128517; Concerts unable to precisely placed:</h3>
+        <h3>&#128517; Concerts unable to be precisely placed:</h3>
       </div>
     `;
 
