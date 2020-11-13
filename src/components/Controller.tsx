@@ -57,27 +57,17 @@ export class Controller extends React.Component<Props, State> {
   componentDidMount() {
     // this is necessary because of the uri redirect after auth - our state gets wiped
     const streamingService = MusicLibraryReader.getStreamingService();
-    // var libraryReader = null;
-    // var artistsCollection = null;
+
     if (streamingService === StreamingService.Spotify) {
       const libraryReader = new SpotifyReader();
-      // libraryReader.getPreviewUri('2JFljHPanIjYy2QqfNYvC0').then((uri) => {
-      //   console.log(uri);
-      // });
-      // this.state = { ...this.state, libraryReader: libraryReader };
+
       this.setState({
         ...this.state,
         libraryReader: libraryReader,
       });
-      // libraryReader
-      //   .fetchArtists()
-      //   .then((response: artistInfo[]) => console.log(response));
 
-      // libraryReader.fetchArtists();
       const artistsCollection = new ArtistCollection(libraryReader);
-      // artistsCollection.fillArtists().then((response) => {
-      //   console.log(artistsCollection.artists);
-      // });
+
       this.updateLoader(true);
       artistsCollection.fillArtists().then((artists) => {
         this.setState({
@@ -92,12 +82,6 @@ export class Controller extends React.Component<Props, State> {
           });
           this.updateLoader(false);
         });
-        // console.log(response);
-        // const concertReader = new SongkickReader();
-        // const concertCollection = new ConcertCollection(concertReader);
-        // concertCollection.fetchConcerts(response).then((response) => {
-        //   console.log(response);
-        // });
       });
     } else if (streamingService === StreamingService.AppleMusic) {
       // todo
@@ -175,13 +159,7 @@ export class Controller extends React.Component<Props, State> {
           }}
           text="Beep Boop...Analyzing your music brain..."
         ></LoadingOverlay>
-        <CustomMap
-          // libraryReader={this.state.libraryReader}
-          divId="map"
-          // userConstraints={this.state.userConstraints}
-          // artists={this.state.artists}
-          getConcertLocations={this.getConcertLocations}
-        />
+        <CustomMap divId="map" getConcertLocations={this.getConcertLocations} />
       </div>
     );
   }

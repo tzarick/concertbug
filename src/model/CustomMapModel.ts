@@ -171,14 +171,6 @@ export class CustomMapModel {
       const isOpen = infoWindow.get('openStatus');
 
       if (!isOpen) {
-        if (!content.toString().includes('spotify:track')) {
-          // add song preview iframe
-          // open window -> load uri preview from spotify -> put it into the window once it arrives. So we don't freeze everything up while waiting
-          // let content = infoWindow.getContent();
-          // this.getPreviewUris(content.toString()).then((response) => {
-          //   infoWindow.setContent(response);
-          // });
-        }
         infoWindow.open(this.googleMap, marker);
         infoWindow.set('openStatus', true);
       } else {
@@ -194,33 +186,6 @@ export class CustomMapModel {
     }
     this.markers = [];
   }
-
-  // private async getPreviewUris(content: string): Promise<HTMLDivElement> {
-  //   const html = document.createElement('div');
-  //   html.innerHTML = content;
-  //   const iframes = html.getElementsByClassName('preview');
-  //   // console.log(iframes.item(0)?.getAttribute('id'));
-  //   let i = 0;
-  //   let item = iframes.item(i);
-  //   while (item && i < 15) {
-  //     // only add previews for the first 15 shows that show up
-  //     const uri = await this.getUri(item.getAttribute('id'));
-  //     if (uri) item.setAttribute('src', uri);
-  //     item.setAttribute('src', 'spotify:track:4xvpttkjjEH0l2hrizYla7');
-  //     console.log(item);
-  //     i++;
-  //     item = iframes.item(i);
-  //   }
-  //   return html;
-  // }
-
-  // private async getUri(artistId: string | null): Promise<string | null> {
-  //   let uri: string | null = '';
-  //   if (artistId) {
-  //     // uri = await this.libraryReader.getPreviewUri(artistId);
-  //   }
-  //   return uri || '';
-  // }
 
   private handleNewCoords(latLng: google.maps.LatLng): void {
     console.log(`lat: ${latLng.lat()}`);
