@@ -16,3 +16,19 @@ export interface SpotifyTopTracksObject {
     }
   ];
 }
+
+export interface SpotifyTopArtistsObject {
+  items: [
+    {
+      images: {
+        url: string;
+      }[];
+      name: string;
+    }
+  ];
+}
+
+// export type TopArtists = {
+//   name: string;
+//   image: string;
+// };

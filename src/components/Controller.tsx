@@ -130,6 +130,14 @@ export class Controller extends React.Component<Props, State> {
     });
   };
 
+  displayTopArtists = () => {
+    if (this.state.artistCollection) {
+      this.state.artistCollection.displayTopArtists(5);
+    } else {
+      window.alert('Try selecting a streaming service first');
+    }
+  };
+
   public render(): JSX.Element {
     return (
       <div className="controller">
@@ -139,6 +147,7 @@ export class Controller extends React.Component<Props, State> {
             this.updateUserContstraints(constraints);
           }}
           onStreamingServiceSelect={this.onStreamingServiceSelect}
+          onStatsQuery={this.displayTopArtists}
           userConstraints={this.state.userConstraints}
         />
         <LoadingOverlay

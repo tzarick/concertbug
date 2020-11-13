@@ -1,12 +1,17 @@
 import { MusicLibraryReader, artistInfo } from './MusicLibraryReader';
 import { hashParamsExist, getHashParams } from '../../utils';
 import axios, { AxiosResponse } from 'axios';
-import { SpotifyTopTracksObject, SpotifyTrackObject } from './spotifyTypes';
+import {
+  SpotifyTopTracksObject,
+  SpotifyTrackObject,
+  SpotifyTopArtistsObject,
+} from './spotifyTypes';
 import lodash from 'lodash';
 
 const _ = lodash;
 
 const savedTracksEndpoint = 'https://api.spotify.com/v1/me/tracks?limit=50';
+const topArtistsEndpoint = 'https://api.spotify.com/v1/me/top/artists';
 
 export class SpotifyReader extends MusicLibraryReader {
   private redirectUri = process.env.REACT_APP_BASE_URL as string;
@@ -239,6 +244,24 @@ export class SpotifyReader extends MusicLibraryReader {
     }
 
     return endpoints;
+  }
+
+  // return a string of top artists
+  async getTopArtists(limit: number): Promise<string[]> {
+    const endpoint = `${topArtistsEndpoint}?limit=${limit}`;
+
+    const topArtistsResponse: AxiosResponse = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const artistsResponse: SpotifyTopArtistsObject = topArtistsResponse.data;
+    const topArtists = artistsResponse.items.map((item) => item.name);
+
+    return topArtists;
   }
 
   // for Spotify "state" param - for security

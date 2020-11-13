@@ -1,7 +1,7 @@
 import React from 'react';
 import { ServiceSelectionMenu } from './ServiceSelectionMenu';
 import { UserConstraints } from './Controller';
-import { Grid } from '@material-ui/core';
+import { Grid, Button } from '@material-ui/core';
 import BugBannerPath from '../styles/images/CBLogo.png';
 import GitHubLogoPath from '../styles/images/GHLogo.png';
 import { FilterForm } from './FilterForm';
@@ -11,12 +11,14 @@ import { MusicLibraryReader } from '../model/aggregators/libraryReader/MusicLibr
 interface Props {
   onFilterConstraintsSubmit: (constraints: UserConstraints) => void;
   onStreamingServiceSelect: (reader: MusicLibraryReader) => void;
+  onStatsQuery: () => void;
   userConstraints: UserConstraints;
 }
 
 export const CustomHeader: React.FC<Props> = ({
   onFilterConstraintsSubmit,
   onStreamingServiceSelect,
+  onStatsQuery,
   userConstraints,
 }) => {
   const classes = gridStyles();
@@ -51,6 +53,18 @@ export const CustomHeader: React.FC<Props> = ({
             userConstraints={userConstraints}
             onSubmit={onFilterConstraintsSubmit}
           />
+        </Grid>
+        <Grid className={classes.headerItem} item>
+          <Button
+            className={classes.headerButton}
+            variant="outlined"
+            color="secondary"
+            aria-controls="simple-menu"
+            aria-haspopup="true"
+            onClick={onStatsQuery}
+          >
+            Stats
+          </Button>
         </Grid>
       </Grid>
       <a href="https://github.com/tzarick/concertbug" target="_blank">

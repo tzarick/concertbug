@@ -17,6 +17,18 @@ export class ArtistCollection {
     return this.artists;
   }
 
+  async displayTopArtists(limit: number): Promise<void> {
+    const topArtists = await this.userLibAggregator.getTopArtists(limit);
+
+    let displayMessage = '💘 Your top artists over the last 6 months: 💘 \n\n';
+    const emojis = ['🤩', '😍', '😘', '😀', '🙂']; // most excited faces -> slightly less excited faces
+
+    topArtists.forEach((artist, i) => {
+      displayMessage += `${i + 1}) ${artist} ${emojis[i]}\n`;
+    });
+
+    window.alert(displayMessage);
+  }
   // an alternative: this static method could work but seems a little less flexible
   // static async newArtistCollection(
   //   userLibAggregator: MusicLibraryReader
