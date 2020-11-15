@@ -46,6 +46,21 @@ export interface SpotifyUserDetailsObject {
   id: string;
 }
 
+export interface SpotifyPlaylistTracksObject {
+  items: [
+    {
+      track: {
+        artists: [
+          {
+            id: string;
+            name: string;
+          }
+        ];
+      };
+    }
+  ];
+  total: number;
+}
 // export type TopArtists = {
 //   name: string;
 //   image: string;

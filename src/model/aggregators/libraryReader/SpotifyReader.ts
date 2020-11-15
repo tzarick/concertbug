@@ -7,6 +7,7 @@ import {
   SpotifyTopArtistsObject,
   SpotifyPlaylistsObject,
   SpotifyUserDetailsObject,
+  SpotifyPlaylistTracksObject,
 } from './spotifyTypes';
 import lodash from 'lodash';
 
@@ -101,7 +102,8 @@ export class SpotifyReader extends MusicLibraryReader {
     const totalTracks = await this.getTotalTrackCount();
     const endpoints = this.generateEndpoints(
       'https://api.spotify.com/v1/me/tracks',
-      totalTracks
+      totalTracks,
+      50
     );
 
     // all batches at once
@@ -149,7 +151,9 @@ export class SpotifyReader extends MusicLibraryReader {
 
   private async fetchPlaylistArtists(): Promise<artistInfo[]> {
     const playlistIds = await this.getPlaylistIds();
-
+    console.log(playlistIds);
+    const playlistArtists = await this.getAllPlaylistArtists(playlistIds);
+    console.log(playlistArtists);
     return [];
   }
 
@@ -161,7 +165,8 @@ export class SpotifyReader extends MusicLibraryReader {
 
     const playlistEndpoints = this.generateEndpoints(
       playlistsEndpoint,
-      playlistCount
+      playlistCount,
+      50
     ); // we might need a batch of endpoints, if the user has over 50 playlists - need to make multiple simultaneous calls - paginated
 
     // all batches at once
@@ -212,6 +217,87 @@ export class SpotifyReader extends MusicLibraryReader {
     return playlistObjects.total;
   }
 
+  private async getAllPlaylistArtists(
+    playlistIds: string[]
+  ): Promise<artistInfo[]> {
+    // const playlistTracksEndpoint = `https://api.spotify.com/v1/playlists/{playlist_id}/tracks?market=US&fields=items(track(artists(name%2Cid)))`;
+
+    const playlistTracksEndpoints = playlistIds.map(
+      (id) => `https://api.spotify.com/v1/playlists/${id}/tracks`
+    );
+
+    let artists: artistInfo[] = [];
+    // playlistTracksEndpoints.forEach(async (endpoint) =>
+    //   artists.push(...(await this.getArtistsFromPlaylist(endpoint)))
+    // );
+
+    for (let endpoint of playlistTracksEndpoints) {
+      artists.push(...(await this.getArtistsFromPlaylist(endpoint)));
+    }
+
+    // const playlistTracksEndpoints = this.generateEndpoints();
+    return artists;
+  }
+
+  private async getArtistsFromPlaylist(
+    endpoint: string
+  ): Promise<artistInfo[]> {
+    const response: AxiosResponse = await axios.get(
+      `${endpoint}?market=US&fields=total`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const totalTrackCount = response.data.total;
+
+    const tracksEndpoints = this.generateEndpoints(
+      `${endpoint}`,
+      totalTrackCount,
+      100,
+      {
+        market: 'US',
+        fields: 'items(track(artists(name,id)))',
+      }
+    ); // if playlist has over 100 songs, we'll need to process in batches
+
+    // all batches at once
+    const trackBatchPromises = tracksEndpoints.map((endpoint) => {
+      return axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+    });
+
+    const responses: AxiosResponse[] = await Promise.all(trackBatchPromises); // all responses at once
+    const artistBatchInfo: artistInfo[] = _.flatten(
+      responses.map((response: AxiosResponse) => {
+        const data: SpotifyPlaylistTracksObject = response.data;
+
+        return _.flatten(
+          data.items.map((trackObj) => {
+            const artists = trackObj.track.artists;
+            const artistInfo: artistInfo[] = artists.map((item) => ({
+              ...item,
+              previewUri: null,
+            }));
+            return artistInfo;
+          })
+        );
+      })
+    );
+
+    // console.log(artistBatchInfo);
+
+    return artistBatchInfo;
+  }
   // Spotify user ID
   private async getUserId(): Promise<string> {
     const userDetailsEndpont = 'https://api.spotify.com/v1/me';
@@ -258,17 +344,26 @@ export class SpotifyReader extends MusicLibraryReader {
 
   // get an enpoint for each paginated response based on the library size. Limit per call = 50.
   // So that we can expedite this fetch process in parallel if there are lots of songs in a lib (like mine..)
-  private generateEndpoints(endpointUrl: string, totalCount: number): string[] {
-    const limitPerResponse = 50; // max
+  private generateEndpoints(
+    endpointUrl: string,
+    totalCount: number,
+    limitPerResponse: number,
+    additionalParams?: { [key: string]: string }
+  ): string[] {
     const numberOfCallsNeeded = Math.ceil(totalCount / limitPerResponse);
 
     let endpoints: string[] = [];
     for (let i = 0; i < numberOfCallsNeeded; i++) {
-      endpoints.push(
-        `${endpointUrl}?offset=${
-          i * limitPerResponse
-        }&limit=${limitPerResponse}`
-      );
+      let endpointBuilder = `${endpointUrl}?offset=${
+        i * limitPerResponse
+      }&limit=${limitPerResponse}`;
+
+      if (additionalParams) {
+        for (let [key, value] of Object.entries(additionalParams)) {
+          endpointBuilder += `&${key}=${value}`;
+        }
+      }
+      endpoints.push(endpointBuilder);
     }
 
     return endpoints;
