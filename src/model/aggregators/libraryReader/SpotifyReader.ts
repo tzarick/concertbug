@@ -47,9 +47,10 @@ export class SpotifyReader extends MusicLibraryReader {
 
   async fetchArtists(): Promise<artistInfo[]> {
     const savedTracksArtists = await this.fetchSavedTracksArtists();
-    // const filledArtists = await this.addPreviewUris(savedTracksArtists);
-    await this.fetchPlaylistArtists();
-    return savedTracksArtists;
+    const playlistArtists = await this.fetchPlaylistArtists();
+    this.mergeArtists(playlistArtists); // merge playlist artists into existing list of artists, avoiding duplicates
+
+    return this.artists;
   }
 
   async getPreviewUri(artistId: string): Promise<string | null> {
@@ -126,14 +127,21 @@ export class SpotifyReader extends MusicLibraryReader {
 
     const artists = _.flatten(artistBatches);
 
-    artists.forEach((artist: artistInfo) => {
+    this.mergeArtists(artists);
+
+    return this.artists;
+  }
+
+  private mergeArtists(artistsToMerge: artistInfo[]): void {
+    artistsToMerge.forEach((artist: artistInfo) => {
       // add only unique artists
-      if (this.artists.findIndex((item) => item.id === artist.id) === -1) {
+      if (
+        this.artists.findIndex((item) => item.id === artist.id) === -1 &&
+        artist.name
+      ) {
         this.artists.push(artist);
       }
     });
-
-    return this.artists;
   }
 
   private getArtistsFromTracksBatch(tracksBatch: AxiosResponse) {
@@ -151,10 +159,8 @@ export class SpotifyReader extends MusicLibraryReader {
 
   private async fetchPlaylistArtists(): Promise<artistInfo[]> {
     const playlistIds = await this.getPlaylistIds();
-    console.log(playlistIds);
     const playlistArtists = await this.getAllPlaylistArtists(playlistIds);
-    console.log(playlistArtists);
-    return [];
+    return playlistArtists;
   }
 
   private async getPlaylistIds(): Promise<string[]> {
@@ -227,15 +233,10 @@ export class SpotifyReader extends MusicLibraryReader {
     );
 
     let artists: artistInfo[] = [];
-    // playlistTracksEndpoints.forEach(async (endpoint) =>
-    //   artists.push(...(await this.getArtistsFromPlaylist(endpoint)))
-    // );
-
     for (let endpoint of playlistTracksEndpoints) {
       artists.push(...(await this.getArtistsFromPlaylist(endpoint)));
     }
 
-    // const playlistTracksEndpoints = this.generateEndpoints();
     return artists;
   }
 
@@ -293,8 +294,6 @@ export class SpotifyReader extends MusicLibraryReader {
         );
       })
     );
-
-    // console.log(artistBatchInfo);
 
     return artistBatchInfo;
   }
