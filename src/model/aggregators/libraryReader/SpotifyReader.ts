@@ -5,6 +5,8 @@ import {
   SpotifyTopTracksObject,
   SpotifyTrackObject,
   SpotifyTopArtistsObject,
+  SpotifyPlaylistsObject,
+  SpotifyUserDetailsObject,
 } from './spotifyTypes';
 import lodash from 'lodash';
 
@@ -45,6 +47,7 @@ export class SpotifyReader extends MusicLibraryReader {
   async fetchArtists(): Promise<artistInfo[]> {
     const savedTracksArtists = await this.fetchSavedTracksArtists();
     // const filledArtists = await this.addPreviewUris(savedTracksArtists);
+    await this.fetchPlaylistArtists();
     return savedTracksArtists;
   }
 
@@ -94,61 +97,12 @@ export class SpotifyReader extends MusicLibraryReader {
     if (hashParamsExist()) this.token = getHashParams().access_token;
   }
 
-  // private async fetchSavedTracksArtistsBatch(
-  //   url: string
-  // ): Promise<string | null> {
-  //   // var trackArtistsArray: string[] = [];
-  //   var next: string | null = null; // if null, no more tracks in lib -> can stop
-  //   await axios
-  //     .get(url, {
-  //       headers: {
-  //         Authorization: `Bearer ${this.token}`,
-  //         Accept: 'application/json',
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //     .then((response: AxiosResponse): void => {
-  //       next = response.data.next;
-
-  //       const artists: artistInfo[] = response.data.items
-  //         .map((item: SpotifyTrackObject) =>
-  //           item.track.artists.map(
-  //             (artist): artistInfo => {
-  //               return { name: artist.name, id: artist.id };
-  //             }
-  //           )
-  //         ) // grab all artists on each track
-  //         .reduce(
-  //           (array: artistInfo[], item: artistInfo[]) => [...array, ...item],
-  //           []
-  //         ); // collapse nested arrays
-
-  //       artists.forEach((artist: artistInfo) => {
-  //         // add only unique artists
-  //         if (this.artists.findIndex((item) => item.id === artist.id) === -1) {
-  //           this.artists.push(artist);
-  //         }
-  //       });
-
-  //       // const trackArtistsSet = new Set<artistInfo>([
-  //       //   ...this.artists,
-  //       //   ...artists,
-  //       // ]); // combine + no duplicates
-
-  //       // this.artists = [...trackArtistsSet]; // back to an array with no duplicates
-  //     })
-  //     .catch((e) => {
-  //       window.alert(
-  //         'This Spotify connection is a bit weak..\n\nIt might be us but.. Try logging in with your streaming service again to make sure :)'
-  //       );
-  //     });
-
-  //   return next; // next url endpoint of next batch (max limit per call is 50)
-  // }
-
   private async fetchSavedTracksArtists(): Promise<artistInfo[]> {
     const totalTracks = await this.getTotalTrackCount();
-    const endpoints = this.generateSavedTracksEndpoints(totalTracks);
+    const endpoints = this.generateEndpoints(
+      'https://api.spotify.com/v1/me/tracks',
+      totalTracks
+    );
 
     // all batches at once
     const savedTrackBatchPromises = endpoints.map((endpoint) => {
@@ -177,15 +131,6 @@ export class SpotifyReader extends MusicLibraryReader {
       }
     });
 
-    // var nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
-    //   savedTracksEndpoint
-    // );
-    // while (nextEndpointUrl !== null) {
-    //   nextEndpointUrl = await this.fetchSavedTracksArtistsBatch(
-    //     nextEndpointUrl
-    //   );
-    // }
-
     return this.artists;
   }
 
@@ -200,6 +145,89 @@ export class SpotifyReader extends MusicLibraryReader {
     ); // grab all artists on each track
 
     return _.flatten(artists);
+  }
+
+  private async fetchPlaylistArtists(): Promise<artistInfo[]> {
+    const playlistIds = await this.getPlaylistIds();
+
+    return [];
+  }
+
+  private async getPlaylistIds(): Promise<string[]> {
+    const userId = await this.getUserId(); // Spotify user ID so we can identify who created the playlist
+
+    const playlistsEndpoint = 'https://api.spotify.com/v1/me/playlists';
+    const playlistCount = await this.getPlaylistCount(playlistsEndpoint);
+
+    const playlistEndpoints = this.generateEndpoints(
+      playlistsEndpoint,
+      playlistCount
+    ); // we might need a batch of endpoints, if the user has over 50 playlists - need to make multiple simultaneous calls - paginated
+
+    // all batches at once
+    const playlistBatchPromises = playlistEndpoints.map((endpoint) => {
+      return axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+    });
+
+    const responses: AxiosResponse[] = await Promise.all(playlistBatchPromises); // all responses at once
+    const playlistBatchIds = responses.map((response: AxiosResponse) => {
+      const data: SpotifyPlaylistsObject = response.data;
+
+      return data.items
+        .filter(
+          (item) =>
+            item.owner.id === userId && // only include playlists made by the current user
+            !item.collaborative && // don't include collab playlists because the user may not be familiar with all of these
+            item.name !== 'Discover Weekly' &&
+            item.name !== 'Liked from Radio'
+        )
+        .map((item) => item.id);
+    });
+
+    const playlistIds = _.flatten(playlistBatchIds);
+
+    return playlistIds;
+  }
+
+  private async getPlaylistCount(endpoint: string): Promise<number> {
+    const playlistResponse: AxiosResponse = await axios.get(
+      `${endpoint}?limit=1`,
+      {
+        // small limit because we are only concerned with the total count info
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const playlistObjects: SpotifyPlaylistsObject = playlistResponse.data;
+    return playlistObjects.total;
+  }
+
+  // Spotify user ID
+  private async getUserId(): Promise<string> {
+    const userDetailsEndpont = 'https://api.spotify.com/v1/me';
+    const userDetailsResponse: AxiosResponse = await axios.get(
+      userDetailsEndpont,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const userDetailsObj: SpotifyUserDetailsObject = userDetailsResponse.data;
+    return userDetailsObj.id;
   }
 
   // total tracks in "Saved Songs" list
@@ -230,14 +258,14 @@ export class SpotifyReader extends MusicLibraryReader {
 
   // get an enpoint for each paginated response based on the library size. Limit per call = 50.
   // So that we can expedite this fetch process in parallel if there are lots of songs in a lib (like mine..)
-  private generateSavedTracksEndpoints(trackCount: number): string[] {
-    const limitPerResponse = 50;
-    const numberOfCallsNeeded = Math.ceil(trackCount / limitPerResponse);
+  private generateEndpoints(endpointUrl: string, totalCount: number): string[] {
+    const limitPerResponse = 50; // max
+    const numberOfCallsNeeded = Math.ceil(totalCount / limitPerResponse);
 
     let endpoints: string[] = [];
     for (let i = 0; i < numberOfCallsNeeded; i++) {
       endpoints.push(
-        `https://api.spotify.com/v1/me/tracks?offset=${
+        `${endpointUrl}?offset=${
           i * limitPerResponse
         }&limit=${limitPerResponse}`
       );
