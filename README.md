@@ -7,7 +7,7 @@
 
 ## What Does It Provide?
 
-- A geographical representation of all your liked artists' shows. Filterable on:
+- A geographical representation of all your artists' shows. Filterable on:
   1. Center point, by clicking anywhere
   2. Distance radius
   3. Date range
