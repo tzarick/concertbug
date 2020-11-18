@@ -13,6 +13,6 @@ export function hashParamsExist(): boolean {
 
 export const UnknownVenueCoords = {
   // atlantic ocean
-  lat: 36.2392423,
-  lng: -72.4949963,
+  lat: 35.46847,
+  lng: -65.189576,
 };

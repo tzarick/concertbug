@@ -166,7 +166,7 @@ export class Controller extends React.Component<Props, State> {
               color: '#E31D1A',
             }),
           }}
-          text="Beep Boop...Analyzing your music brain..."
+          text="...analyzing...beep boop..."
         ></LoadingOverlay>
         <CustomMap divId="map" getConcertLocations={this.getConcertLocations} />
       </div>

@@ -1,5 +1,6 @@
 import { mapStyles } from '../styles/mapStyles';
 import bugMarkerPath from '../styles/images/BugMarker64.png';
+import compassMarkerPath from '../styles/images/compass.png';
 import { UniqueConcertLocation } from './concerts/ConcertCollection';
 import { Concert } from './concerts/Concert';
 import { UnknownVenueCoords } from './utils';
@@ -43,12 +44,24 @@ export class CustomMapModel {
   }
 
   placeMarker(coords: google.maps.LatLng, concerts: Concert[]): void {
-    var marker = new google.maps.Marker({
-      position: coords,
-      map: this.googleMap,
-      icon: bugMarkerPath,
-      animation: google.maps.Animation.BOUNCE,
-    });
+    const isUnknownVenue =
+      concerts[0].venue.location.lat() === UnknownVenueCoords.lat &&
+      concerts[0].venue.location.lng() === UnknownVenueCoords.lng;
+
+    var marker = isUnknownVenue
+      ? new google.maps.Marker({
+          // compass marker with no animation
+          position: coords,
+          map: this.googleMap,
+          icon: compassMarkerPath,
+        })
+      : new google.maps.Marker({
+          // bug-microphone marker with a bounce animation
+          position: coords,
+          map: this.googleMap,
+          icon: bugMarkerPath,
+          animation: google.maps.Animation.BOUNCE,
+        });
 
     this.attachInfoWindow(marker, concerts, coords);
 
