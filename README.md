@@ -8,32 +8,34 @@
 ## What Does It Provide?
 
 - A geographical representation of all your liked artists' shows. Filterable on:
-  1. Distance radius
-  2. Date range
+  1. Center point, by clicking anywhere
+  2. Distance radius
+  3. Date range
 - Information about each show:
   - Date/time
   - Venue
   - Ticket info
+  - Other artists on bill
   - Embedded playable track from the selected artist
 - Bonus Feature(s) :cowboy_hat_face:
 
 ## Details
 
-_Tech Stack:_
+Tech Stack:
 
 - TypeScript
 - React.js
 - VSCode
 - Heroku
 
-_Resources:_
+External Services:
 
 - Spotify Web API
 - SongKick API
 - Google Maps Web API
-- (Apple Music API in the future hopefully)
+- (Apple Music API in the future, hopefully)
 
-_Essential Packages:_
+Thankful for these packages:
 
 - [axios](https://github.com/axios/axios)
 - [materialUI](https://material-ui.com/)
@@ -41,7 +43,8 @@ _Essential Packages:_
 
 ---
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Logo Design :art:: [Tray Stidham](https://www.behance.net/TrayStidham/appreciated)  
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
 
 ### Note...
 
