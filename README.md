@@ -43,7 +43,8 @@ Thankful for these packages:
 
 ---
 
-:art: Logo Design: [Tray Stidham](https://www.behance.net/TrayStidham/appreciated)  
+:art: Logo Design: [Tray Stidham](https://www.behance.net/TrayStidham/appreciated)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
 
 ### Note...
