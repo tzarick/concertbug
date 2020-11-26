@@ -10,6 +10,9 @@ import {
   UniqueConcertLocation,
 } from '../model/concerts/ConcertCollection';
 import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
+import { AlertDialog } from './AlertDialog';
+import { getTopArtistsDisplay } from './TopArtists';
+import { AlertDialogDispatcher } from './AlertDialogDispatcher';
 
 export interface UserConstraints {
   distanceRadius: number; // miles
@@ -31,7 +34,15 @@ interface State {
   concertCollection: ConcertCollection | null;
   artistCollection: ArtistCollection | null;
   loaderActive: boolean;
-  // artists: Artist[];
+  alerts: {
+    doneReading: boolean;
+    notLoggedIn: boolean;
+    stats: boolean;
+  };
+  topArtistInfo: {
+    name: string;
+    image: string;
+  }[];
 }
 
 export class Controller extends React.Component<Props, State> {
@@ -51,6 +62,13 @@ export class Controller extends React.Component<Props, State> {
         startDate: new Date(), // now, as default start
         endDate: new Date('2100-01-01'), // far in the future, as default end
       },
+      alerts: {
+        // alert windows
+        doneReading: false,
+        notLoggedIn: false,
+        stats: false,
+      },
+      topArtistInfo: [],
     };
   }
 
@@ -81,6 +99,13 @@ export class Controller extends React.Component<Props, State> {
             concertCollection: concertCollection,
           });
           this.updateLoader(false);
+          this.setState({
+            ...this.state,
+            alerts: {
+              ...this.state.alerts,
+              doneReading: true,
+            },
+          });
         });
       });
     } else if (streamingService === StreamingService.AppleMusic) {
@@ -89,6 +114,17 @@ export class Controller extends React.Component<Props, State> {
       console.log('Not logged in');
     }
   }
+
+  getGreeting = (): string => {
+    const greetings = [
+      'Wow you have good taste.',
+      'Lovely library you have there.',
+      'Thanks for waiting.',
+    ];
+
+    const randomIndex = Math.floor(Math.random() * greetings.length);
+    return greetings[randomIndex];
+  };
 
   updateUserContstraints(newConstraints: UserConstraints) {
     this.setState({
@@ -130,12 +166,41 @@ export class Controller extends React.Component<Props, State> {
     });
   };
 
-  displayTopArtists = () => {
+  displayTopArtists = async () => {
     if (this.state.artistCollection) {
-      this.state.artistCollection.displayTopArtists(5);
+      const topArtistInfo = await this.state.artistCollection.getTopArtists(5);
+      console.log(topArtistInfo);
+      this.setState({
+        ...this.state,
+        alerts: {
+          ...this.state.alerts,
+          stats: true,
+        },
+        topArtistInfo: topArtistInfo,
+      });
     } else {
       window.alert('Try selecting a streaming service first');
     }
+  };
+
+  statsRequested = (requested: boolean) => {
+    this.setState({
+      ...this.state,
+      alerts: {
+        ...this.state.alerts,
+        stats: requested,
+      },
+    });
+  };
+
+  isDoneReading = (done: boolean) => {
+    this.setState({
+      ...this.state,
+      alerts: {
+        ...this.state.alerts,
+        doneReading: done,
+      },
+    });
   };
 
   public render(): JSX.Element {
@@ -168,6 +233,34 @@ export class Controller extends React.Component<Props, State> {
           }}
           text="...analyzing...beep boop..."
         ></LoadingOverlay>
+        {/* <AlertDialog
+          title={this.getGreeting()}
+          content={<p>Click any location on the map to see nearby concerts.</p>}
+          open={this.state.alerts.doneReading}
+          close={() => {
+            this.isDoneReading(false);
+          }}
+          fullWidth={false}
+          maxWidth={false}
+        />
+        <AlertDialog
+          title="Your top artists over the past 6 months: 💘"
+          content={getTopArtistsDisplay(this.state.topArtistInfo)}
+          open={this.state.alerts.stats}
+          close={() => {
+            this.statsRequested(false);
+          }}
+          fullWidth={true}
+          maxWidth={'md'}
+        /> */}
+        <AlertDialogDispatcher
+          getGreeting={this.getGreeting}
+          doneReading={this.state.alerts.doneReading}
+          isDoneReading={this.isDoneReading}
+          topArtistsDisplay={getTopArtistsDisplay(this.state.topArtistInfo)}
+          statsState={this.state.alerts.stats}
+          statsRequested={this.statsRequested}
+        />
         <CustomMap divId="map" getConcertLocations={this.getConcertLocations} />
       </div>
     );

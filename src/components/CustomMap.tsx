@@ -12,6 +12,7 @@ interface Props {
 
 interface State {
   mapCenter: google.maps.LatLng;
+  notLoggedInAlert: boolean;
 }
 
 const DefaultStartCoords = {
@@ -30,7 +31,7 @@ export class CustomMap extends React.Component<Props, State> {
       DefaultStartCoords.lat,
       DefaultStartCoords.lng
     );
-    this.state = { mapCenter: center };
+    this.state = { mapCenter: center, notLoggedInAlert: false };
   }
 
   componentDidMount(): void {
@@ -43,7 +44,7 @@ export class CustomMap extends React.Component<Props, State> {
   }
 
   private updateCenter = (center: google.maps.LatLng): void => {
-    this.setState({ mapCenter: center });
+    this.setState({ ...this.state, mapCenter: center });
   };
 
   private centerHasBeenSet(): boolean {
@@ -54,16 +55,10 @@ export class CustomMap extends React.Component<Props, State> {
   }
 
   render(): JSX.Element {
-    // if (this.map && this.props.libraryReader && this.props.artists.length > 0) {
     if (this.map && this.centerHasBeenSet()) {
       this.map.clearMarkers();
-      // Artists and Concerts are both stored in controller's state - filled here *usually*
-      // this.map.setCenter(this.state.mapCenter); // instead of re-centering here we would get the new list of concerts / generate new markers based on the changed inputs
 
-      // const concertCollection = new ConcertCollection(new SongkickReader());
-      // concertCollection.fetchConcerts(this.props.artists).then((concerts) => {
-      //   console.log(concerts);
-      // });
+      // get the new list of concerts / generate new markers based on the changed inputs
       const uniqueLocations = this.props.getConcertLocations(
         this.state.mapCenter
       );
@@ -73,11 +68,10 @@ export class CustomMap extends React.Component<Props, State> {
       } else {
         this.map.placeMarkers(uniqueLocations);
       }
-
-      // this.map.placeMarker(this.state.mapCenter);
     }
 
     console.log('renderoo');
+
     return <div className="googlemap" id={this.props.divId} />;
   }
 }

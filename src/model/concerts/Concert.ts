@@ -5,7 +5,6 @@ type ConcertArtist = {
   concertServiceId: string;
 };
 
-// export class Concert {}
 export interface Concert {
   displayName: string;
   artist: {

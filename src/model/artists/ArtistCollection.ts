@@ -7,27 +7,16 @@ export class ArtistCollection {
 
   async fillArtists(): Promise<Artist[]> {
     this.artists = await this.userLibAggregator.fetchArtists();
-    // for (let artist of artists) {
-    //   // const uri = await this.userLibAggregator.getPreviewUri(artist.id);
-    //   this.artists.push({
-    //     name: artist.name,
-    //     songPreviewUri: null, // we hit the max request limit if we do this now. fill later
-    //   });
-    // }
+
     return this.artists;
   }
 
-  async displayTopArtists(limit: number): Promise<void> {
+  async getTopArtists(
+    limit: number
+  ): Promise<{ name: string; image: string }[]> {
     const topArtists = await this.userLibAggregator.getTopArtists(limit);
 
-    let displayMessage = '💘 Your top artists over the last 6 months: 💘 \n\n';
-    const emojis = ['🤩', '😍', '😘', '😀', '🙂']; // most excited faces -> slightly less excited faces
-
-    topArtists.forEach((artist, i) => {
-      displayMessage += `${i + 1}) ${artist} ${emojis[i]}\n`;
-    });
-
-    window.alert(displayMessage);
+    return topArtists;
   }
   // an alternative: this static method could work but seems a little less flexible
   // static async newArtistCollection(

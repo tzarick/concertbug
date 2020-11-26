@@ -369,7 +369,9 @@ export class SpotifyReader extends MusicLibraryReader {
   }
 
   // return a string of top artists
-  async getTopArtists(limit: number): Promise<string[]> {
+  async getTopArtists(
+    limit: number
+  ): Promise<{ name: string; image: string }[]> {
     const endpoint = `${topArtistsEndpoint}?limit=${limit}`;
 
     const topArtistsResponse: AxiosResponse = await axios.get(endpoint, {
@@ -381,7 +383,10 @@ export class SpotifyReader extends MusicLibraryReader {
     });
 
     const artistsResponse: SpotifyTopArtistsObject = topArtistsResponse.data;
-    const topArtists = artistsResponse.items.map((item) => item.name);
+    const topArtists = artistsResponse.items.map((item) => ({
+      name: item.name,
+      image: item.images.length ? item.images[0].url : '',
+    }));
 
     return topArtists;
   }

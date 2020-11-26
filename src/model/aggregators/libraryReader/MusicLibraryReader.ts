@@ -16,7 +16,9 @@ export abstract class MusicLibraryReader {
   abstract authenticate(): boolean;
   abstract async fetchArtists(): Promise<artistInfo[]>;
   abstract async getPreviewUri(artistId: string): Promise<string | null>;
-  abstract async getTopArtists(limit: number): Promise<string[]>;
+  abstract async getTopArtists(
+    limit: number
+  ): Promise<{ name: string; image: string }[]>;
 
   protected buildFullUrl(baseUrl: string, params: UrlParam[]): string {
     params.forEach((param, i) => {
