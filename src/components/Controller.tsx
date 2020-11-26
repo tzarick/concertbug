@@ -10,7 +10,6 @@ import {
   UniqueConcertLocation,
 } from '../model/concerts/ConcertCollection';
 import { SongkickReader } from '../model/aggregators/concertReader/SongkickReader';
-import { AlertDialog } from './AlertDialog';
 import { getTopArtistsDisplay } from './TopArtists';
 import { AlertDialogDispatcher } from './AlertDialogDispatcher';
 
@@ -233,26 +232,6 @@ export class Controller extends React.Component<Props, State> {
           }}
           text="...analyzing...beep boop..."
         ></LoadingOverlay>
-        {/* <AlertDialog
-          title={this.getGreeting()}
-          content={<p>Click any location on the map to see nearby concerts.</p>}
-          open={this.state.alerts.doneReading}
-          close={() => {
-            this.isDoneReading(false);
-          }}
-          fullWidth={false}
-          maxWidth={false}
-        />
-        <AlertDialog
-          title="Your top artists over the past 6 months: 💘"
-          content={getTopArtistsDisplay(this.state.topArtistInfo)}
-          open={this.state.alerts.stats}
-          close={() => {
-            this.statsRequested(false);
-          }}
-          fullWidth={true}
-          maxWidth={'md'}
-        /> */}
         <AlertDialogDispatcher
           getGreeting={this.getGreeting}
           doneReading={this.state.alerts.doneReading}
