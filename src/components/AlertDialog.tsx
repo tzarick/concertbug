@@ -61,39 +61,3 @@ export const AlertDialog: React.FC<DialogProps> = ({
     </div>
   );
 };
-
-// export const AlertDialog = (props: DialogProps) => {
-//   const [open, setOpen] = React.useState(props.open);
-//   // const handleClickOpen = () => {
-//   //   setOpen(true);
-//   // };
-//   const handleClose = () => {
-//     setOpen(false);
-//     // props.close();
-//   };
-//   console.log(open);
-//   return (
-//     <div>
-//       {/* <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-//         Open alert dialog
-//       </Button> */}
-//       <Dialog
-//         open={true}
-//         onClose={handleClose}
-//         TransitionComponent={Transition}
-//         aria-labelledby="alert-dialog-title"
-//         aria-describedby="alert-dialog-description"
-//       >
-//         <DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
-//         <DialogContent>
-//           <Typography id="alert-dialog-description">{props.content}</Typography>
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={handleClose} color="primary" autoFocus>
-//             OK
-//           </Button>
-//         </DialogActions>
-//       </Dialog>
-//     </div>
-//   );
-// };

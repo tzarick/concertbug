@@ -11,7 +11,7 @@ export const getTopArtistsDisplay = (
       position: i,
     };
   });
-  const emojis = ['😍', '🤩', '😘', '😀', '🙂', '🙃', '⭐']; // most excited faces -> slightly less excited faces
+  const emojis = ['😍', '🤩', '😘', '😀', '🙂', '🙃', '⭐']; // most excited -> slightly less excited
 
   const middle = Math.floor(artistInfoUpdated.length / 2);
   const firstHalf = artistInfoUpdated.slice(0, middle);
@@ -26,7 +26,7 @@ export const getTopArtistsDisplay = (
     >
       <Grid
         container
-        spacing={2}
+        spacing={4}
         direction="row"
         justify="center"
         alignItems="center"
@@ -40,7 +40,7 @@ export const getTopArtistsDisplay = (
       </Grid>
       <Grid
         container
-        spacing={2}
+        spacing={4}
         direction="row"
         justify="center"
         alignItems="center"
@@ -70,7 +70,6 @@ const TopArtist = (
       <img
         src={artistInfo.image}
         alt={`Pictured: ${artistInfo.name}`}
-        // width="500"
         height="200"
       ></img>
     </Grid>
